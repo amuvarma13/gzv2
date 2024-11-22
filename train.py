@@ -9,7 +9,7 @@ import torchaudio
 # print(gz.__file__)  # Prints the file path of the loaded gazelle module
 
 
-from ghj.gzf import (
+from gzf import (
     GazelleConfig,
     GazelleForConditionalGeneration,
     GazelleProcessor,

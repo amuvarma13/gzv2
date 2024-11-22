@@ -3,7 +3,7 @@ import transformers
 from transformers import Trainer, TrainingArguments
 import torchaudio
 
-from gazelle.gazelle import (
+from gazelle.gazelle.modeling_gazelle import (
     GazelleConfig,
     GazelleForConditionalGeneration,
     GazelleProcessor,

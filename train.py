@@ -2,7 +2,7 @@ import torch
 import transformers
 from transformers import Trainer, TrainingArguments
 import torchaudio
-from transformers import Wav2Vec2Config, LlamaConfig, Trainer, TrainingArguments
+from transformers import Wav2Vec2Config, LlamaConfig, Trainer, TrainingArguments, AutoTokenizer
 from gzf import (
     GazelleConfig,
     GazelleForConditionalGeneration,
@@ -57,10 +57,11 @@ model = model.to(device, dtype=dtype)
 
 print("loaded model")
 
-tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+print("loaded tokenizer")
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
+print("added special tokens")
 model.resize_token_embeddings(len(tokenizer))
-
 print("resized token embeddings")
 
 file_path = 'transcribe_exps.txt'

@@ -49,6 +49,7 @@ model = model.to(device, dtype=dtype)
 tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 # Don't forget to resize model embeddings if you have a model:
+print("model device", model.device)
 model.resize_token_embeddings(len(tokenizer))
 
 import wandb

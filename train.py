@@ -10,9 +10,6 @@ from gzf import (
 )
 
 model_id = "meta-llama/Llama-2-7b-chat-hf"
-nt = transformers.AutoTokenizer.from_pretrained(model_id)
-token = nt.convert_ids_to_tokens(32000)
-print(token)
 
 from transformers import Wav2Vec2Config, LlamaConfig
 import torch

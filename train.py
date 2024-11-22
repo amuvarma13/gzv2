@@ -2,79 +2,92 @@ import torch
 import transformers
 from transformers import Trainer, TrainingArguments
 import torchaudio
-from transformers import Wav2Vec2Config, LlamaConfig, Trainer, TrainingArguments, AutoTokenizer
+
 from gzf import (
     GazelleConfig,
     GazelleForConditionalGeneration,
     GazelleProcessor,
 )
-import random
-from datasets import load_dataset, Dataset
-import wandb
 
 model_id = "meta-llama/Llama-2-7b-chat-hf"
-audio_model_id = "facebook/wav2vec2-base-960h"
-
-project="colab-a100-40gb"
-name = "llama7bchat-200k-6"
-dsn = "amuvarma/mls-eng-10k-200k"
-
-
-ds = load_dataset(dsn)
-dataset = ds["train"]
-
-wandb.init( project = project, name=name)
-
-
 nt = transformers.AutoTokenizer.from_pretrained(model_id)
+token = nt.convert_ids_to_tokens(32000)
+print(token)
+
+from transformers import Wav2Vec2Config, LlamaConfig
+import torch
+import transformers
+from transformers import Trainer, TrainingArguments
+import torchaudio
 
 
-# device = "cpu"
-# dtype = torch.float32
-# if torch.cuda.is_available():
-#     device = "cuda"
-#     dtype = torch.float16  # Changed from torch.bfloat16 to torch.float16
-#     print(f"Using {device} device with dtype {dtype}")
-# elif torch.backends.mps.is_available():
-#     device = "mps"
-#     dtype = torch.float16
-#     print(f"Using {device} device with dtype {dtype}")
-
-
+from gzf import (
+    GazelleConfig,
+    GazelleForConditionalGeneration,
+    GazelleProcessor,
+)
+# model_id = "meta-llama/Llama-2-7b-chat-hf"
 audio_config = Wav2Vec2Config()
 
 text_config = LlamaConfig()
 
 
-config = GazelleConfig(audio_model_id=audio_model_id, text_model_id=model_id)
+import torch
+device = "cpu"
+dtype= torch.float32
+if torch.cuda.is_available():
+    device = "cuda"
+    dtype = torch.bfloat16
+    print(f"Using {device} device")
+elif torch.backends.mps.is_available():
+    device = "mps"
+    dtype = torch.float16
+    print(f"Using {device} device")
+
+
+config = GazelleConfig(audio_model_id="facebook/wav2vec2-base-960h", text_model_id=model_id)
 model = GazelleForConditionalGeneration(config)
-model = model.to("cuda")
+model = model.to(device, dtype=dtype)
 
-
-tokenizer = AutoTokenizer.from_pretrained(model_id)
+tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
+# Don't forget to resize model embeddings if you have a model:
 model.resize_token_embeddings(len(tokenizer))
 
-file_path = 'transcribe_exps.txt'
+import wandb
+wandb.init(
+    project="colab-a100-40gb",
+    name = "llama7bchat-200k-6"
+    )
+file_path = '/content/transcribe_exps.txt'
 
 try:
     with open(file_path, 'r', encoding='utf-8') as file:
         expressions = [line.strip() for line in file if line.strip()]
+    print(expressions)
 except FileNotFoundError:
     print(f"The file {file_path} does not exist.")
 except IOError:
     print(f"An error occurred while reading the file {file_path}.")
 
 
+from datasets import load_dataset
+dsn = "amuvarma/mls-eng-10k-200k"
+ds = load_dataset(dsn)
 
 
-
+import torch
+model = model.to(dtype=dtype)
+# First freeze all parameters
 for param in model.parameters():
    param.requires_grad = False
 
+# Then unfreeze just the multi_modal_projector
+# First set requires_grad
 for name, param in model.named_parameters():
     if "multi_modal_projector" in name:
         param.requires_grad = True
+        torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
 for name, param in model.named_parameters():
@@ -84,12 +97,16 @@ for name, param in model.named_parameters():
 trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 all_params = sum(p.numel() for p in model.parameters())
 
+print(f"\nTrainable parameters: {trainable_params:,}")
+print(f"All parameters: {all_params:,}")
 
+audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
+    "facebook/wav2vec2-base-960h"
+)
 
+from datasets import Dataset
 
-
-audio_processor = transformers.Wav2Vec2Processor.from_pretrained(audio_model_id)
-
+dataset = ds["train"]
 
 
 def inference_collator(audio_input, ass_res, instruction="Transcribe the following \n<|audio|>"):
@@ -118,15 +135,14 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
 
 
     return {
-        "audio_values": audio_input.to(dtype=torch.bfloat16),
-        "input_ids": labels,
-        "labels": true_labels,
-        "attention_mask": attention_mask
+        "audio_values": audio_input.to(model.device).to(model.dtype),
+        "input_ids": labels.to(model.device),
+        "labels": true_labels.to(model.device),
+        "attention_mask": attention_mask.to(model.device)
     }
 
 
-
-
+import random
 class AudioChatDataCollator:
     def __init__(self, instruction="Transcribe the following \n<|audio|>"):
         self.instruction = instruction
@@ -148,8 +164,6 @@ class AudioChatDataCollator:
             "attention_mask": batch["attention_mask"].cpu()
         }
     
-
-
 training_args = TrainingArguments(
     output_dir="./audio-chat-test",
     per_device_train_batch_size=4,
@@ -168,7 +182,6 @@ training_args = TrainingArguments(
     bf16=True
 )
 
-
 trainer = Trainer(
     model=model,
     args=training_args,
@@ -176,6 +189,4 @@ trainer = Trainer(
     data_collator=AudioChatDataCollator(),
 )
 
-
 trainer.train()
-

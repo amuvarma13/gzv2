@@ -30,17 +30,15 @@ nt = transformers.AutoTokenizer.from_pretrained(model_id)
 
 
 device = "cpu"
-dtype= torch.float32
+dtype = torch.float32
 if torch.cuda.is_available():
     device = "cuda"
-    dtype = torch.bfloat16
-    print(f"Using {device} device")
+    dtype = torch.float16  # Changed from torch.bfloat16 to torch.float16
+    print(f"Using {device} device with dtype {dtype}")
 elif torch.backends.mps.is_available():
     device = "mps"
     dtype = torch.float16
-    print(f"Using {device} device")
-
-
+    print(f"Using {device} device with dtype {dtype}")
 
 
 audio_config = Wav2Vec2Config()
@@ -169,7 +167,7 @@ training_args = TrainingArguments(
     remove_unused_columns=False,
     warmup_ratio=0.03,
     lr_scheduler_type="cosine",
-    bf16=True
+    fp16=True
 )
 
 

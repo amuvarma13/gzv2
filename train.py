@@ -43,7 +43,7 @@ elif torch.backends.mps.is_available():
     print(f"Using {device} device")
 
 
-print("set device")
+print("set device", device)
 
 
 audio_config = Wav2Vec2Config()

@@ -43,13 +43,13 @@ elif torch.backends.mps.is_available():
 
 
 config = GazelleConfig(audio_model_id="facebook/wav2vec2-base-960h", text_model_id=model_id)
-model = GazelleForConditionalGeneration(config)
+model = GazelleForConditionalGeneration(config).to(device, dtype=dtype)
 model = model.to(device, dtype=dtype)
 
 tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 # Don't forget to resize model embeddings if you have a model:
-print("model device", model.device, tokenizer.device)
+print("model device", model.device)
 model.resize_token_embeddings(len(tokenizer))
 
 import wandb

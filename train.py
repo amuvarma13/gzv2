@@ -3,7 +3,7 @@ import transformers
 from transformers import Trainer, TrainingArguments
 import torchaudio
 
-import gazelle as gz
+import src.gazelle as gz
 
 print(gz)
 cf = gz.GazelleConfig

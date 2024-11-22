@@ -54,6 +54,7 @@ text_config = LlamaConfig()
 config = GazelleConfig(audio_model_id=audio_model_id, text_model_id=model_id)
 model = GazelleForConditionalGeneration(config)
 model = model.to("cuda")
+model = model.to(dtype=dtype)
 
 print("loaded model")
 
@@ -64,8 +65,6 @@ print("added special tokens", len(tokenizer))
 print(model)
 model.resize_token_embeddings(len(tokenizer))
 print("resized token embeddings")
-
-# model = model.to(device, dtype=dtype)
 
 file_path = 'transcribe_exps.txt'
 
@@ -79,7 +78,7 @@ except IOError:
     print(f"An error occurred while reading the file {file_path}.")
 
 
-model = model.to(dtype=dtype)
+
 
 print("moved model to dtype")
 

@@ -5,7 +5,7 @@ import torchaudio
 
 
 import src as gz
-print(gz)
+print(gz.gazelle.__file__)  # Prints the file path of the loaded gazelle package
 print(gz.__file__)  # Prints the file path of the loaded gazelle module
 
 

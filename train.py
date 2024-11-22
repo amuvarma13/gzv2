@@ -4,9 +4,9 @@ from transformers import Trainer, TrainingArguments
 import torchaudio
 
 
-import gazelle
-print(gazelle)
-print(gazelle.__file__)  # Prints the file path of the loaded gazelle module
+import gazelle as gz
+print(gz)
+print(gz.__file__)  # Prints the file path of the loaded gazelle module
 
 
 from src.gazelle import (

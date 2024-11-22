@@ -55,7 +55,7 @@ model.resize_token_embeddings(len(tokenizer))
 import wandb
 wandb.init(
     project="colab-a100-40gb",
-    name = "llama7bchat-200k-6"
+    name = "vmllama7bchat-200k-6"
     )
 
 file_path = 'transcribe_exps.txt'

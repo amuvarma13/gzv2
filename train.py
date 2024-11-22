@@ -60,7 +60,6 @@ file_path = 'transcribe_exps.txt'
 try:
     with open(file_path, 'r', encoding='utf-8') as file:
         expressions = [line.strip() for line in file if line.strip()]
-    print(expressions)
 except FileNotFoundError:
     print(f"The file {file_path} does not exist.")
 except IOError:
@@ -119,7 +118,7 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
 
 
     return {
-        "audio_values": audio_input.to(dtype=torch.float16),
+        "audio_values": audio_input.to(dtype=torch.bfloat16),
         "input_ids": labels,
         "labels": true_labels,
         "attention_mask": attention_mask
@@ -166,7 +165,7 @@ training_args = TrainingArguments(
     remove_unused_columns=False,
     warmup_ratio=0.03,
     lr_scheduler_type="cosine",
-    fp16=True
+    bf16=True
 )
 
 

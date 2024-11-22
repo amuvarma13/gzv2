@@ -48,8 +48,7 @@ text_config = LlamaConfig()
 
 config = GazelleConfig(audio_model_id=audio_model_id, text_model_id=model_id)
 model = GazelleForConditionalGeneration(config)
-model = model.to("cuda")
-model = model.to(dtype=dtype)
+# model = model.to("cuda")
 
 
 tokenizer = AutoTokenizer.from_pretrained(model_id)

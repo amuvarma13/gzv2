@@ -43,8 +43,11 @@ elif torch.backends.mps.is_available():
 
 
 config = GazelleConfig(audio_model_id="facebook/wav2vec2-base-960h", text_model_id=model_id)
-model = GazelleForConditionalGeneration(config).to(device, dtype=dtype)
-model = model.to(device, dtype=dtype)
+# model = GazelleForConditionalGeneration(config).to(device, dtype=dtype)
+# model = model.to(device, dtype=dtype)
+
+model = GazelleForConditionalGeneration(config).to(dtype=dtype)
+# model = model.to(device, dtype=dtype)
 
 tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
@@ -63,7 +66,6 @@ file_path = 'transcribe_exps.txt'
 try:
     with open(file_path, 'r', encoding='utf-8') as file:
         expressions = [line.strip() for line in file if line.strip()]
-    print(expressions)
 except FileNotFoundError:
     print(f"The file {file_path} does not exist.")
 except IOError:

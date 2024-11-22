@@ -9,7 +9,7 @@ from gazelle.gazelle import (
     GazelleProcessor,
 )
 
-model_id = "meta-llama/Llama-3.2-3B-Instruct"
+model_id = "meta-llama/Llama-2-7b-chat-hf"
 nt = transformers.AutoTokenizer.from_pretrained(model_id)
 token = nt.convert_ids_to_tokens(32000)
 print(token)

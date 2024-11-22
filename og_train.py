@@ -46,6 +46,8 @@ model = GazelleForConditionalGeneration.from_pretrained(
     torch_dtype=dtype,
 )
 
+print(model)
+
 import wandb
 wandb.init(
     project="colab-a100-40gb",

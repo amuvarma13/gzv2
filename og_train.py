@@ -46,8 +46,6 @@ model = GazelleForConditionalGeneration.from_pretrained(
     torch_dtype=dtype,
 )
 
-tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
-
 import wandb
 wandb.init(
     project="colab-a100-40gb",

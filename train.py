@@ -16,7 +16,7 @@ model_id = "meta-llama/Llama-2-7b-chat-hf"
 audio_model_id = "facebook/wav2vec2-base-960h"
 
 project="colab-a100-40gb"
-name = "llama3b-200k-6"
+name = "llama7bchat-200k-6"
 dsn = "amuvarma/mls-eng-10k-200k"
 
 

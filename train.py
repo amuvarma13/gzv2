@@ -5,9 +5,9 @@ import torchaudio
 
 import gazelle as gz
 
+print(gz)
 cf = gz.GazelleConfig
 
-print(cf)
 
 from gazelle import (
     GazelleConfig,

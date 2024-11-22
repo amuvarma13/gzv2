@@ -19,14 +19,12 @@ project="colab-a100-40gb"
 name = "llama3b-200k-6"
 dsn = "amuvarma/mls-eng-10k-200k"
 
-print("completed imports")
 
 ds = load_dataset(dsn)
 dataset = ds["train"]
 
 wandb.init( project = project, name=name)
 
-print("initialised wandb")
 
 nt = transformers.AutoTokenizer.from_pretrained(model_id)
 
@@ -43,7 +41,6 @@ elif torch.backends.mps.is_available():
     print(f"Using {device} device")
 
 
-print("set device", device)
 
 
 audio_config = Wav2Vec2Config()
@@ -56,15 +53,10 @@ model = GazelleForConditionalGeneration(config)
 model = model.to("cuda")
 model = model.to(dtype=dtype)
 
-print("loaded model")
 
 tokenizer = AutoTokenizer.from_pretrained(model_id)
-print("loaded tokenizer")
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
-print("added special tokens", len(tokenizer))
-print(model)
 model.resize_token_embeddings(len(tokenizer))
-print("resized token embeddings")
 
 file_path = 'transcribe_exps.txt'
 
@@ -80,7 +72,6 @@ except IOError:
 
 
 
-print("moved model to dtype")
 
 for param in model.parameters():
    param.requires_grad = False
@@ -97,15 +88,12 @@ for name, param in model.named_parameters():
 trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 all_params = sum(p.numel() for p in model.parameters())
 
-print(f"\nTrainable parameters: {trainable_params:,}")
-print(f"All parameters: {all_params:,}")
 
-print("set trainable parameters")
+
 
 
 audio_processor = transformers.Wav2Vec2Processor.from_pretrained(audio_model_id)
 
-print("loaded audio processor")
 
 
 def inference_collator(audio_input, ass_res, instruction="Transcribe the following \n<|audio|>"):
@@ -141,7 +129,6 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
     }
 
 
-print("created inference collator")
 
 
 class AudioChatDataCollator:
@@ -165,7 +152,6 @@ class AudioChatDataCollator:
             "attention_mask": batch["attention_mask"].cpu()
         }
     
-print("created data collator")
 
 
 training_args = TrainingArguments(
@@ -186,7 +172,6 @@ training_args = TrainingArguments(
     bf16=True
 )
 
-print("created training arguments")
 
 trainer = Trainer(
     model=model,
@@ -195,8 +180,6 @@ trainer = Trainer(
     data_collator=AudioChatDataCollator(),
 )
 
-print("created trainer")
 
 trainer.train()
 
-print("completed training")

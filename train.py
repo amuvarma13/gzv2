@@ -3,7 +3,7 @@ import transformers
 from transformers import Trainer, TrainingArguments
 import torchaudio
 
-import gazelle.gazelle as gz
+import gazelle as gz
 
 print(gz)
 

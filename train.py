@@ -3,15 +3,13 @@ import transformers
 from transformers import Trainer, TrainingArguments
 import torchaudio
 
-import gazelle as gz
 
-print(gz)
 
-# from gazelle.gazelle import (
-#     GazelleConfig,
-#     GazelleForConditionalGeneration,
-#     GazelleProcessor,
-# )
+from gazelle import (
+    GazelleConfig,
+    GazelleForConditionalGeneration,
+    GazelleProcessor,
+)
 
 model_id = "meta-llama/Llama-2-7b-chat-hf"
 nt = transformers.AutoTokenizer.from_pretrained(model_id)

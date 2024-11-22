@@ -57,6 +57,8 @@ wandb.init(
     project="colab-a100-40gb",
     name = "llama7bchat-200k-6"
     )
+
+expressions = []
 file_path = '/content/transcribe_exps.txt'
 
 try:
@@ -72,6 +74,8 @@ except IOError:
 from datasets import load_dataset
 dsn = "amuvarma/mls-eng-10k-200k"
 ds = load_dataset(dsn)
+
+
 
 
 import torch

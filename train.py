@@ -58,7 +58,7 @@ wandb.init(
     name = "llama7bchat-200k-6"
     )
 
-file_path = '/transcribe_exps.txt'
+file_path = 'transcribe_exps.txt'
 
 try:
     with open(file_path, 'r', encoding='utf-8') as file:

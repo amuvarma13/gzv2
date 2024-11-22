@@ -170,7 +170,7 @@ class AudioChatDataCollator:
 training_args = TrainingArguments(
     output_dir="./audio-chat-test",
     per_device_train_batch_size=4,
-    gradient_accumulation_steps=16,  # Changed to 16
+    gradient_accumulation_steps=8,  # Changed to 16
     num_train_epochs=1,
     learning_rate=2e-3,  # Changed to 2*10^-3
     save_strategy="no",

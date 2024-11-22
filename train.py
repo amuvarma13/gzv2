@@ -65,6 +65,8 @@ print(model)
 model.resize_token_embeddings(len(tokenizer))
 print("resized token embeddings")
 
+# model = model.to(device, dtype=dtype)
+
 file_path = 'transcribe_exps.txt'
 
 try:

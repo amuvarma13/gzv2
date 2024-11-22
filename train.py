@@ -33,11 +33,11 @@ from transformers import Trainer, TrainingArguments
 import torchaudio
 
 
-from gazelle.gazelle import (
-    GazelleConfig,
-    GazelleForConditionalGeneration,
-    GazelleProcessor,
-)
+# from gazelle.gazelle import (
+#     GazelleConfig,
+#     GazelleForConditionalGeneration,
+#     GazelleProcessor,
+# )
 # model_id = "meta-llama/Llama-2-7b-chat-hf"
 audio_config = Wav2Vec2Config()
 

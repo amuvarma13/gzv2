@@ -3,13 +3,10 @@ import transformers
 from transformers import Trainer, TrainingArguments
 import torchaudio
 
-import src.gazelle as gz
-
-print(gz)
-cf = gz.GazelleConfig
 
 
-from gazelle import (
+
+from src.gazelle import (
     GazelleConfig,
     GazelleForConditionalGeneration,
     GazelleProcessor,

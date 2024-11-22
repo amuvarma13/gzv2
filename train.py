@@ -4,12 +4,12 @@ from transformers import Trainer, TrainingArguments
 import torchaudio
 
 
-# import gazelle as gz
-# print(gz)
-# print(gz.__file__)  # Prints the file path of the loaded gazelle module
+import gazelle as gz
+print(gz)
+print(gz.__file__)  # Prints the file path of the loaded gazelle module
 
 
-from gzv2.src.gazelle import (
+from src.gazelle import (
     GazelleConfig,
     GazelleForConditionalGeneration,
     GazelleProcessor,

@@ -2,25 +2,35 @@ import torch
 import transformers
 from transformers import Trainer, TrainingArguments
 import torchaudio
-
-
-# import src as gz
-# print(gz.gazelle.__file__)  # Prints the file path of the loaded gazelle package
-# print(gz.__file__)  # Prints the file path of the loaded gazelle module
-
-
+from transformers import Wav2Vec2Config, LlamaConfig, Trainer, TrainingArguments
 from gzf import (
     GazelleConfig,
     GazelleForConditionalGeneration,
     GazelleProcessor,
 )
+import random
+from datasets import load_dataset, Dataset
+import wandb
 
 model_id = "meta-llama/Llama-2-7b-chat-hf"
-nt = transformers.AutoTokenizer.from_pretrained(model_id)
-token = nt.convert_ids_to_tokens(32000)
-print(token)
+audio_model_id = "facebook/wav2vec2-base-960h"
 
-import torch
+project="colab-a100-40gb"
+name = "llama3b-200k-6"
+dsn = "amuvarma/mls-eng-10k-200k"
+
+print("completed imports")
+
+ds = load_dataset(dsn)
+dataset = ds["train"]
+
+wandb.init( project = project, name=name)
+
+print("initialised wandb")
+
+nt = transformers.AutoTokenizer.from_pretrained(model_id)
+
+
 device = "cpu"
 dtype= torch.float32
 if torch.cuda.is_available():
@@ -32,40 +42,26 @@ elif torch.backends.mps.is_available():
     dtype = torch.float16
     print(f"Using {device} device")
 
-from transformers import Wav2Vec2Config, LlamaConfig
-import torch
-import transformers
-from transformers import Trainer, TrainingArguments
-import torchaudio
+
+print("set device")
 
 
-# from gazelle.gazelle import (
-#     GazelleConfig,
-#     GazelleForConditionalGeneration,
-#     GazelleProcessor,
-# )
-# model_id = "meta-llama/Llama-2-7b-chat-hf"
 audio_config = Wav2Vec2Config()
 
 text_config = LlamaConfig()
 
 
-
-
-config = GazelleConfig(audio_model_id="facebook/wav2vec2-base-960h", text_model_id=model_id)
+config = GazelleConfig(audio_model_id=audio_model_id, text_model_id=model_id)
 model = GazelleForConditionalGeneration(config)
 model = model.to(device, dtype=dtype)
 
+print("loaded model")
+
 tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
-# Don't forget to resize model embeddings if you have a model:
 model.resize_token_embeddings(len(tokenizer))
 
-import wandb
-wandb.init(
-    project="colab-a100-40gb",
-    name = "llama3b-200k-6"
-    )
+print("resized token embeddings")
 
 file_path = 'transcribe_exps.txt'
 
@@ -79,23 +75,16 @@ except IOError:
     print(f"An error occurred while reading the file {file_path}.")
 
 
-from datasets import load_dataset
-dsn = "amuvarma/mls-eng-10k-200k"
-ds = load_dataset(dsn)
-
-
-import torch
 model = model.to(dtype=dtype)
-# First freeze all parameters
+
+print("moved model to dtype")
+
 for param in model.parameters():
    param.requires_grad = False
 
-# Then unfreeze just the multi_modal_projector
-# First set requires_grad
 for name, param in model.named_parameters():
     if "multi_modal_projector" in name:
         param.requires_grad = True
-        torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
 for name, param in model.named_parameters():
@@ -108,14 +97,12 @@ all_params = sum(p.numel() for p in model.parameters())
 print(f"\nTrainable parameters: {trainable_params:,}")
 print(f"All parameters: {all_params:,}")
 
+print("set trainable parameters")
 
-audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
-    "facebook/wav2vec2-base-960h"
-)
 
-from datasets import Dataset
+audio_processor = transformers.Wav2Vec2Processor.from_pretrained(audio_model_id)
 
-dataset = ds["train"]
+print("loaded audio processor")
 
 
 def inference_collator(audio_input, ass_res, instruction="Transcribe the following \n<|audio|>"):
@@ -151,7 +138,9 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
     }
 
 
-import random
+print("created inference collator")
+
+
 class AudioChatDataCollator:
     def __init__(self, instruction="Transcribe the following \n<|audio|>"):
         self.instruction = instruction
@@ -173,6 +162,7 @@ class AudioChatDataCollator:
             "attention_mask": batch["attention_mask"].cpu()
         }
     
+print("created data collator")
 
 
 training_args = TrainingArguments(
@@ -193,6 +183,7 @@ training_args = TrainingArguments(
     bf16=True
 )
 
+print("created training arguments")
 
 trainer = Trainer(
     model=model,
@@ -201,4 +192,8 @@ trainer = Trainer(
     data_collator=AudioChatDataCollator(),
 )
 
+print("created trainer")
+
 trainer.train()
+
+print("completed training")

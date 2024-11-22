@@ -120,9 +120,9 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
 
     return {
         "audio_values": audio_input.to(dtype=torch.float16),
-        "input_ids": labels.to(dtype=torch.float16), 
-        "labels": true_labels.to(dtype=torch.float16),
-        "attention_mask": attention_mask.to(dtype=torch.float16)
+        "input_ids": labels,
+        "labels": true_labels,
+        "attention_mask": attention_mask
     }
 
 

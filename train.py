@@ -46,7 +46,7 @@ config = GazelleConfig(
     text_model_id=model_id, 
     audio_token_index = 128256, 
     vocab_size=128256,
-    hidden_size = 2048
+
     )
 
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)

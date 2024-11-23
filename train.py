@@ -9,7 +9,7 @@ from gzf import (
     GazelleProcessor,
 )
 
-model_id = "meta-llama/Llama-2-7b-chat"
+model_id = "meta-llama/Llama-2-7b-chat-hf"
 
 from transformers import Wav2Vec2Config, LlamaConfig
 import torch

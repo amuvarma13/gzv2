@@ -41,6 +41,8 @@ elif torch.backends.mps.is_available():
 
 
 model_id = "meta-llama/Llama-3.2-3B-Instruct"
+
+
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h", 
     text_model_id=model_id, 
@@ -62,7 +64,7 @@ print(model)
 import wandb
 wandb.init(
     project="colab-a100-40gb",
-    name = "vmllama3bchat-200k-8h100s-1"
+    name = "vmllama3bchat-500k-8h100s-2"
     )
 
 file_path = 'transcribe_exps.txt'

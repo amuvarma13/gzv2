@@ -23,7 +23,7 @@ from gzf import (
     GazelleForConditionalGeneration,
     GazelleProcessor,
 )
-model_id = "mistralai/Mistral-7B-Instruct-v0.1"
+# model_id = "mistralai/Mistral-7B-Instruct-v0.1"
 
 
 

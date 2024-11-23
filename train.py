@@ -57,6 +57,8 @@ tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 print("model device", model.device)
 model.resize_token_embeddings(len(tokenizer))
 
+print(model)
+
 import wandb
 wandb.init(
     project="colab-a100-40gb",

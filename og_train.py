@@ -36,7 +36,7 @@ elif torch.backends.mps.is_available():
     print(f"Using {device} device")
 
 
-model_id = "tincans-ai/gazelle-v0.2"
+model_id = "tincans-ai/gazelle-v0.1"
 config = GazelleConfig.from_pretrained(model_id)
 tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
 # model = model.to(device, dtype=dtype)

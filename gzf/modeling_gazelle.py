@@ -109,14 +109,14 @@ class GazelleConfig(PretrainedConfig):
         ignore_index=-100,
         audio_token_index=32000,
         vocab_size=32000,
-        hidden_size=4096,
+        hidden_size=3072,
         stack_factor=8,
         projector_type="mlp",
         **kwargs,
     ):
         self.ignore_index = ignore_index
         self.audio_token_index = audio_token_index
-        self.vocab_size = 3072
+        self.vocab_size = vocab_size
         print("self.vocab_size", self.vocab_size)
 
         self.audio_model_id = audio_model_id
@@ -126,6 +126,7 @@ class GazelleConfig(PretrainedConfig):
         self.text_config = text_config
 
         self.hidden_size = hidden_size
+        print("self.hidden_size", self.hidden_size)
         self.stack_factor = stack_factor
         self.projector_type = projector_type
 

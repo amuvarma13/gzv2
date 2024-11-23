@@ -254,9 +254,9 @@ class GazelleProjector(ProjectionLayer):
         )
         self.act = SwiGLU()
         self.linear_2 = nn.Linear(
-            self.hidden_dim // 2, config.text_config.hidden_size, bias=False
+            self.hidden_dim // 2, self.hidden_dim, bias=False
         )
-        self.ln_post = RMSNorm(config.text_config.hidden_size)
+        self.ln_post = RMSNorm(self.hidden_dim)
 
     def forward(self, audio_features: torch.Tensor) -> torch.Tensor:
         audio_features = self._pad_and_stack(audio_features)

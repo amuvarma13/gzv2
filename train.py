@@ -9,7 +9,7 @@ from gzf import (
     GazelleProcessor,
 )
 
-model_id = "meta-llama/Llama-2-7b-chat-hf"
+
 
 from transformers import Wav2Vec2Config, LlamaConfig
 import torch
@@ -23,7 +23,6 @@ from gzf import (
     GazelleForConditionalGeneration,
     GazelleProcessor,
 )
-# model_id = "mistralai/Mistral-7B-Instruct-v0.1"
 
 
 
@@ -41,14 +40,16 @@ elif torch.backends.mps.is_available():
 
 
 
-# model = GazelleForConditionalGeneration.from_pretrained(
-
-config = GazelleConfig(audio_model_id="facebook/wav2vec2-base-960h", text_model_id=model_id)
-# model = GazelleForConditionalGeneration(config).to(device, dtype=dtype)
-# model = model.to(device, dtype=dtype)
+model_id = "meta-llama/Llama-3.2-3B-Instruct"
+config = GazelleConfig(
+    audio_model_id="facebook/wav2vec2-base-960h", 
+    text_model_id=model_id, 
+    audio_token_index = 128256, 
+    vocab_size=128256,
+    hidden_size = 3072
+    )
 
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
-# model = model.to(device, dtype=dtype)
 
 tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})

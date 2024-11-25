@@ -80,7 +80,7 @@ except IOError:
 
 from datasets import load_dataset
 dsn = "amuvarma/mls-eng-10k-dev-3k"
-ds = load_dataset(dsn, split="dev")
+ds = load_dataset(dsn)
 
 
 
@@ -115,7 +115,7 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 
 from datasets import Dataset
 
-dataset = ds
+dataset = ds["dev"]
 
 
 def inference_collator(audio_input, ass_res, instruction="Transcribe the following \n<|audio|>"):

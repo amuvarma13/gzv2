@@ -218,7 +218,8 @@ except Exception as e:
 print("Loading the model using GazelleForConditionalGeneration directly")
 try:
     config_custom = GazelleConfig(
-    audio_token_index=134412, 
+    audio_token_index=134412,
+    text_model_id=model_id, 
     vocab_size=134412,  # Updated vocab_size
 )
     loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(output_dir, config=config_custom)

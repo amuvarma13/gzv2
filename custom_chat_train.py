@@ -86,9 +86,13 @@ print("Config vocab_size:", config.vocab_size)  # Should match tokenizer's vocab
 # 9. Instantiate the model with the updated config
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 
+
+
 # 10. Resize token embeddings to match tokenizer's vocab size
 model.resize_token_embeddings(len(tokenizer))
-print("Model's embed_tokens.weight shape:", model.language_model.model.embed_tokens.weight.shape)
+# print("Model's embed_tokens.weight shape:", model.language_model.model.embed_tokens.weight.shape)
+
+print("models new config", model.config)
 
 # 11. Freeze all parameters except 'multi_modal_projector'
 for param in model.parameters():
@@ -219,7 +223,6 @@ print("Loading the model using GazelleForConditionalGeneration directly")
 try:
     config_custom = GazelleConfig(
     audio_token_index=134412,
-    text_model_id=model_id, 
     vocab_size=134412,  # Updated vocab_size
 )
     loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(output_dir, config=config_custom)

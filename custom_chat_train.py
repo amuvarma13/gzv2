@@ -168,13 +168,18 @@ class AudioChatDataCollator:
 
         batch = inference_collator(audio, assistant_response, random_expression)
 
+        # return {
+        #     "audio_values": batch["audio_values"].cpu(),
+        #     "input_ids": batch["input_ids"].cpu(),
+        #     "labels": batch["labels"].cpu(),
+        #     "attention_mask": batch["attention_mask"].cpu()
+        # }
         return {
-            "audio_values": batch["audio_values"].cpu(),
-            "input_ids": batch["input_ids"].cpu(),
-            "labels": batch["labels"].cpu(),
-            "attention_mask": batch["attention_mask"].cpu()
+            "audio_values": batch["audio_values"],
+            "input_ids": batch["input_ids"],
+            "labels": batch["labels"],
+            "attention_mask": batch["attention_mask"]
         }
-    
 
 
 print("creating trainer")

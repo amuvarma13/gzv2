@@ -31,7 +31,7 @@ device = "cpu"
 dtype= torch.float32
 if torch.cuda.is_available():
     device = "cuda"
-    dtype = torch.float16
+    dtype = torch.bfloat16
     print(f"Using {device} device")
 elif torch.backends.mps.is_available():
     device = "mps"
@@ -175,8 +175,8 @@ class AudioChatDataCollator:
     
 training_args = TrainingArguments(
     output_dir="./audio-chat-test",
-    per_device_train_batch_size=1,
-    gradient_accumulation_steps=1,  # Changed to 16
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
     learning_rate=2e-3,  # Changed to 2*10^-3
     save_strategy="no",
@@ -188,7 +188,7 @@ training_args = TrainingArguments(
     remove_unused_columns=False,
     warmup_ratio=0.03,
     lr_scheduler_type="cosine",
-    fp16=True
+    bf16=True
 )
 
 trainer = Trainer(

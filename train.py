@@ -144,7 +144,7 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
 
 
     return {
-        "audio_values": audio_input.to(model.device).to(model.dtype),
+        "audio_values": audio_values.to(model.device).to(model.dtype),
         "input_ids": labels.to(model.device),
         "labels": true_labels.to(model.device),
         "attention_mask": attention_mask.to(model.device)

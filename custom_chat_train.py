@@ -143,7 +143,7 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
 
     attention_mask = torch.ones_like(labels)
 
-
+    print("moving data to model device", model.device)
     return {
         "audio_values": audio_input.to(model.device).to(model.dtype),
         "input_ids": labels.to(model.device),

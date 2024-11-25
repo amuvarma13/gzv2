@@ -4,8 +4,12 @@ from datasets import Dataset
 from transformers import Wav2Vec2Config, LlamaConfig
 import torch
 import transformers
-from transformers import Trainer, TrainingArguments, GazelleForConditionalGeneration
+from transformers import Trainer, TrainingArguments
 import torchaudio
+
+from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
+
+MODEL_FOR_CAUSAL_LM_MAPPING.register("gazelle", GazelleForConditionalGeneration)
 
 
 from gzf import (
@@ -215,6 +219,6 @@ print(trainer.model)
 
 trainer.model.save_pretrained(output_dir)
 
-from transformers import GazelleForConditionalGeneration
-loaded_model = GazelleForConditionalGeneration.from_pretrained(output_dir)
+from transformers import AutoModel
+loaded_model = AutoModel.from_pretrained(output_dir)
 print("loaded model", loaded_model)

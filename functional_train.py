@@ -212,7 +212,7 @@ trainer = Trainer(
 
 print("training")
 
-# trainer.train()
+trainer.train()
 
 
 # Save model and tokenizer

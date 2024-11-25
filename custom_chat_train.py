@@ -1,13 +1,3 @@
-import torch
-import transformers
-from transformers import Trainer, TrainingArguments
-import torchaudio
-
-from gzf import (
-    GazelleConfig,
-    GazelleForConditionalGeneration,
-    GazelleProcessor,
-)
 from datasets import Dataset
 
 
@@ -24,8 +14,9 @@ from gzf import (
     GazelleProcessor,
 )
 
+import wandb
 
-import torch
+
 device = "cpu"
 dtype= torch.float32
 if torch.cuda.is_available():
@@ -62,7 +53,7 @@ tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 print("model device", model.device)
 model.resize_token_embeddings(len(tokenizer))
 
-import wandb
+
 wandb.init(
     project="colab-a100-40gb",
     name = "vmllama-speechchat-500k-8h100s-2"

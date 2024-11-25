@@ -4,7 +4,7 @@ from datasets import Dataset
 from transformers import Wav2Vec2Config, LlamaConfig
 import torch
 import transformers
-from transformers import Trainer, TrainingArguments
+from transformers import Trainer, TrainingArguments, GazelleForConditionalGeneration
 import torchaudio
 
 
@@ -215,6 +215,6 @@ print(trainer.model)
 
 trainer.model.save_pretrained(output_dir)
 
-from transformers import AutoModel
-loaded_model = AutoModel.from_pretrained(output_dir)
+from transformers import GazelleForConditionalGeneration
+loaded_model = GazelleForConditionalGeneration.from_pretrained(output_dir)
 print("loaded model", loaded_model)

@@ -117,7 +117,7 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 
 from datasets import Dataset
 
-dataset = ds["dev"]
+dataset = ds["train"]
 
 
 def inference_collator(audio_input, ass_res, instruction="Transcribe the following \n<|audio|>"):

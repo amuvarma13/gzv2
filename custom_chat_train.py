@@ -9,7 +9,6 @@ import torchaudio
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
-MODEL_FOR_CAUSAL_LM_MAPPING.register("gazelle", GazelleForConditionalGeneration)
 
 
 from gzf import (
@@ -17,6 +16,8 @@ from gzf import (
     GazelleForConditionalGeneration,
     GazelleProcessor,
 )
+
+MODEL_FOR_CAUSAL_LM_MAPPING.register("gazelle", GazelleForConditionalGeneration)
 
 import wandb
 

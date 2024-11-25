@@ -8,7 +8,7 @@ from gzf import (
     GazelleForConditionalGeneration,
     GazelleProcessor,
 )
-
+from datasets import Dataset
 
 
 from transformers import Wav2Vec2Config, LlamaConfig
@@ -23,7 +23,6 @@ from gzf import (
     GazelleForConditionalGeneration,
     GazelleProcessor,
 )
-
 
 
 import torch
@@ -82,12 +81,14 @@ except IOError:
 
 from datasets import load_dataset
 dsn = "amuvarma/mls-eng-10k-500k"
-ds = load_dataset(dsn)
+ds = load_dataset(dsn, split="train")
+# dataset = ds["train"]
+
+dataset = ds
 
 
 
 
-import torch
 model = model.to(dtype=dtype)
 # First freeze all parameters
 for param in model.parameters():
@@ -115,9 +116,9 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
     "facebook/wav2vec2-base-960h"
 )
 
-from datasets import Dataset
 
-dataset = ds["train"]
+
+print("creating collator")
 
 
 def inference_collator(audio_input, ass_res, instruction="Transcribe the following \n<|audio|>"):
@@ -158,6 +159,7 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
         "attention_mask": attention_mask.to(model.device)
     }
 
+print("creating data collator")
 
 import random
 class AudioChatDataCollator:
@@ -181,6 +183,10 @@ class AudioChatDataCollator:
             "attention_mask": batch["attention_mask"].cpu()
         }
     
+
+
+print("creating trainer")
+
 training_args = TrainingArguments(
     output_dir="./audio-chat-test",
     per_device_train_batch_size=4,
@@ -205,5 +211,7 @@ trainer = Trainer(
     train_dataset=dataset,
     data_collator=AudioChatDataCollator(),
 )
+
+print("training")
 
 trainer.train()

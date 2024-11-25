@@ -92,7 +92,7 @@ model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 model.resize_token_embeddings(len(tokenizer))
 # print("Model's embed_tokens.weight shape:", model.language_model.model.embed_tokens.weight.shape)
 
-print("models new config", model.config)
+special_config =  model.config
 
 # 11. Freeze all parameters except 'multi_modal_projector'
 for param in model.parameters():
@@ -221,11 +221,8 @@ except Exception as e:
 # 20. (Optional) Load the model using the custom class directly
 print("Loading the model using GazelleForConditionalGeneration directly")
 try:
-    config_custom = GazelleConfig(
-    audio_token_index=134412,
-    vocab_size=134412,  # Updated vocab_size
-)
-    loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(output_dir, config=config_custom)
+
+    loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config)
     print("Loaded model with custom class:", loaded_model_custom)
 except Exception as e:
     print("Error during model loading with GazelleForConditionalGeneration:", e)

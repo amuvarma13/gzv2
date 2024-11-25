@@ -219,7 +219,7 @@ print("Loading the model using GazelleForConditionalGeneration directly")
 try:
     config_custom = GazelleConfig(
     audio_token_index=134412, 
-    vocab_size=len(tokenizer),  # Updated vocab_size
+    vocab_size=134412,  # Updated vocab_size
 )
     loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(output_dir, config=config_custom)
     print("Loaded model with custom class:", loaded_model_custom)

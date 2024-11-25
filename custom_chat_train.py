@@ -46,8 +46,8 @@ model_id = "amuvarma/convo-tts-tune-7contentonly"
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h", 
     text_model_id=model_id, 
-    audio_token_index = 128256, 
-    vocab_size=128256,
+    audio_token_index = 134411, 
+    vocab_size=134411,
 
     )
 

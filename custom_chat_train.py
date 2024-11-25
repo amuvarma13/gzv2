@@ -79,7 +79,7 @@ except IOError:
 
 
 from datasets import load_dataset
-dsn = "amuvarma/mls-eng-10k-dev-3k"
+dsn = "amuvarma/mls-eng-10k-500k"
 ds = load_dataset(dsn)
 
 
@@ -123,22 +123,26 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
         audio=audio_input, return_tensors="pt", sampling_rate=16000
     ).input_values
 
-    msgs = [
-        {"role": "user", "content": instruction},
-        {"role": "assistant", "content": ass_res}
-    ]
+    user_phrase = "<|audio|>"
+    user_tokens = tokenizer.encode(user_phrase)
+    assistant_tokens = tokenizer.encode(ass_res)
 
-    labels = tokenizer.apply_chat_template(
-        msgs, return_tensors="pt", add_generation_prompt=True
-    )
+    print("user_tokens", user_tokens)
 
-    user_msg = [{"role": "user", "content": instruction}, {"role":"assistant", "content":""}]
-    user_tokens = tokenizer.apply_chat_template(
-        user_msg, return_tensors="pt", add_generation_prompt=True
-    )
+    user_tokens = tokenizer.encode(user_phrase)
 
+    # Adding the specified tokens at start and end
+    start_tokens = [128259, 128000]
+    end_tokens = [128009, 128260, 128261]
+
+    # Combine all tokens while keeping batch dimension
+    user_tokens = torch.tensor([start_tokens + user_tokens + end_tokens ])
+    labels = torch.tensor([start_tokens + user_tokens + end_tokens + assistant_tokens + [128009]])
     true_labels = torch.full_like(labels, -100)
     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
+
+    print("true_labels", true_labels)
+    print("input_ids", labels)
 
     attention_mask = torch.ones_like(labels)
 

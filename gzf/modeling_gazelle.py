@@ -117,7 +117,6 @@ class GazelleConfig(PretrainedConfig):
         self.ignore_index = ignore_index
         self.audio_token_index = audio_token_index
         self.vocab_size = vocab_size
-        print("self.vocab_size", self.vocab_size)
 
         self.audio_model_id = audio_model_id
         self.text_model_id = text_model_id

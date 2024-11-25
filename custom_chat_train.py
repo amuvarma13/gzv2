@@ -19,7 +19,7 @@ from gzf import (
 )
 
 MODEL_FOR_CAUSAL_LM_MAPPING.register("gazelle", GazelleForConditionalGeneration)
-CONFIG_MAPPING["gazelle"] = GazelleConfig
+# CONFIG_MAPPING["gazelle"] = GazelleConfig
 
 import wandb
 

@@ -184,7 +184,7 @@ training_args = TrainingArguments(
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
     learning_rate=2e-3,  # Changed to 2*10^-3
-    save_strategy="no",
+    # save_strategy="no",
     logging_steps=1,
     evaluation_strategy="no",
     report_to="wandb",
@@ -193,7 +193,8 @@ training_args = TrainingArguments(
     remove_unused_columns=False,
     warmup_ratio=0.03,
     lr_scheduler_type="cosine",
-    bf16=True
+    bf16=True, 
+    save_steps = 50
 )
 
 trainer = Trainer(

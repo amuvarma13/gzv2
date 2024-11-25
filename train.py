@@ -59,8 +59,6 @@ tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 print("model device", model.device)
 model.resize_token_embeddings(len(tokenizer))
 
-print(model)
-
 import wandb
 wandb.init(
     project="colab-a100-40gb",
@@ -115,7 +113,7 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 
 from datasets import Dataset
 
-dataset = ds["dev"]
+dataset = ds["train"]
 
 
 def inference_collator(audio_input, ass_res, instruction="Transcribe the following \n<|audio|>"):
@@ -144,7 +142,7 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
 
 
     return {
-        "audio_values": audio_values.to(model.device).to(model.dtype),
+        "audio_values": audio_input.to(model.device).to(model.dtype),
         "input_ids": labels.to(model.device),
         "labels": true_labels.to(model.device),
         "attention_mask": attention_mask.to(model.device)

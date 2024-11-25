@@ -6,6 +6,7 @@ import torch
 import transformers
 from transformers import Trainer, TrainingArguments
 import torchaudio
+from transformers import CONFIG_MAPPING
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
@@ -18,6 +19,7 @@ from gzf import (
 )
 
 MODEL_FOR_CAUSAL_LM_MAPPING.register("gazelle", GazelleForConditionalGeneration)
+CONFIG_MAPPING["gazelle"] = GazelleConfig
 
 import wandb
 
@@ -220,7 +222,8 @@ print(trainer.model)
 
 trainer.model.save_pretrained(output_dir)
 
-from transformers import AutoModel, AutoConfig
-config = AutoConfig.from_pretrained(output_dir)
-loaded_model = AutoModel.from_pretrained(output_dir, config=config)
+from transformers import AutoModelForCausalLM
+# , AutoConfig
+# config = AutoConfig.from_pretrained(output_dir)
+loaded_model = AutoModelForCausalLM.from_pretrained(output_dir, )#config=config
 print("loaded model", loaded_model)

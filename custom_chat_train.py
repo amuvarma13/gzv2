@@ -129,7 +129,7 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
     user_input_ids = tokenizer(user_phrase, return_tensors="pt").input_ids
     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
 
-    print("user_input_ids", user_input_ids.shape)
+    # print("user_input_ids", user_input_ids.shape)
 
     # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
 
@@ -145,8 +145,8 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
     true_labels = torch.full_like(labels, -100)
     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
 
-    print("true_labels", true_labels)
-    print("input_ids", labels)
+    # print("true_labels", true_labels)
+    # print("input_ids", labels)
 
     attention_mask = torch.ones_like(labels)
 

@@ -206,3 +206,8 @@ trainer = Trainer(
 print("training")
 
 trainer.train()
+
+
+# Save model and tokenizer
+output_dir = "mymodel"
+trainer.save_model(output_dir)

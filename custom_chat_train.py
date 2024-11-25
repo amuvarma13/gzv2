@@ -59,8 +59,6 @@ tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 print("model device", model.device)
 model.resize_token_embeddings(len(tokenizer))
 
-print(model)
-
 import wandb
 wandb.init(
     project="colab-a100-40gb",
@@ -126,6 +124,8 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
     user_phrase = "<|audio|>"
     user_input_ids = tokenizer(user_phrase, return_tensors="pt").input_ids
     assistant_tokens = tokenizer(ass_res, return_tensors="pt").input_ids
+
+    print("user_input_ids", user_input_ids.shape)
 
     # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
 

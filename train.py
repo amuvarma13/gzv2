@@ -59,6 +59,8 @@ tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 print("model device", model.device)
 model.resize_token_embeddings(len(tokenizer))
 
+print(model)
+
 import wandb
 wandb.init(
     project="colab-a100-40gb",
@@ -84,8 +86,6 @@ ds = load_dataset(dsn)
 
 
 import torch
-
-print("moving model to", dtype)
 model = model.to(dtype=dtype)
 # First freeze all parameters
 for param in model.parameters():
@@ -115,7 +115,7 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 
 from datasets import Dataset
 
-dataset = ds["dev"]
+dataset = ds["train"]
 
 
 def inference_collator(audio_input, ass_res, instruction="Transcribe the following \n<|audio|>"):

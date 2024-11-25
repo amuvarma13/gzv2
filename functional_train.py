@@ -59,7 +59,7 @@ tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 print("model device", model.device)
 model.resize_token_embeddings(len(tokenizer))
 
-
+special_config =  model.config
 wandb.init(
     project="colab-a100-40gb",
     name = "vmllamaspeechcontentonly-500k-8h100s-3"
@@ -220,10 +220,15 @@ output_dir = "mymodel"
 # trainer.save_model(output_dir)
 print(trainer.model)
 
-trainer.model.save_pretrained(output_dir)
+trainer.model.save_pretrained(output_dir, safe_serialization=True)
 
-from transformers import AutoModelForCausalLM
-# , AutoConfig
-# config = AutoConfig.from_pretrained(output_dir)
-loaded_model = AutoModelForCausalLM.from_pretrained(output_dir, )#config=config
-print("loaded model", loaded_model)
+
+print("Loading the model using GazelleForConditionalGeneration directly")
+try:
+
+    loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
+    print("Loaded model with custom class:", loaded_model_custom)
+except Exception as e:
+    print("Error during model loading with GazelleForConditionalGeneration:", e)
+
+

@@ -70,6 +70,8 @@ ds = load_dataset(dsn, split="dev")
 dataset = ds
 
 # 8. Initialize configuration with updated vocab_size
+model_id = "amuvarma/convo-tts-tune-7contentonly"
+
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h", 
     text_model_id=model_id, 

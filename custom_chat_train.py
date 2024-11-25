@@ -53,7 +53,7 @@ config = GazelleConfig(
 
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 
-tokenizer = transformers.AutoTokenizer.from_pretrained(model_id)
+tokenizer = transformers.AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-3B-Instruct")
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 # Don't forget to resize model embeddings if you have a model:
 print("model device", model.device)

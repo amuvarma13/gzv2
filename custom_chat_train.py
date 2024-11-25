@@ -143,7 +143,7 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
 
     attention_mask = torch.ones_like(labels)
 
-    print("moving data to model device", model.device)
+
     return {
         "audio_values": audio_input.to(model.device).to(model.dtype),
         "input_ids": labels.to(model.device),
@@ -168,18 +168,13 @@ class AudioChatDataCollator:
 
         batch = inference_collator(audio, assistant_response, random_expression)
 
-        # return {
-        #     "audio_values": batch["audio_values"].cpu(),
-        #     "input_ids": batch["input_ids"].cpu(),
-        #     "labels": batch["labels"].cpu(),
-        #     "attention_mask": batch["attention_mask"].cpu()
-        # }
         return {
-            "audio_values": batch["audio_values"],
-            "input_ids": batch["input_ids"],
-            "labels": batch["labels"],
-            "attention_mask": batch["attention_mask"]
+            "audio_values": batch["audio_values"].cpu(),
+            "input_ids": batch["input_ids"].cpu(),
+            "labels": batch["labels"].cpu(),
+            "attention_mask": batch["attention_mask"].cpu()
         }
+    
 
 
 print("creating trainer")

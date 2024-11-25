@@ -60,7 +60,7 @@ model.resize_token_embeddings(len(tokenizer))
 
 wandb.init(
     project="colab-a100-40gb",
-    name = "vmllamaspeechcontentonly-500k-8h100s-3"
+    name = "jointvmllamaspeechcontentonly-500k-8h100s-3"
     )
 
 file_path = 'transcribe_exps.txt'

@@ -211,5 +211,10 @@ print("training")
 # Save model and tokenizer
 output_dir = "mymodel"
 # trainer.save_model(output_dir)
+print(trainer.model)
 
 trainer.model.save_pretrained(output_dir)
+
+from transformers import AutoModel
+loaded_model = AutoModel.from_pretrained(output_dir)
+print("loaded model", loaded_model)

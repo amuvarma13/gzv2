@@ -71,10 +71,10 @@ except IOError:
 
 
 from datasets import load_dataset
-# dsn = "amuvarma/mls-eng-10k-500k"
-dsn = "amuvarma/mls-eng-10k-dev-3k"
-ds = load_dataset(dsn, split="dev")
-# dataset = ds["train"]
+dsn = "amuvarma/mls-eng-10k-500k"
+# dsn = "amuvarma/mls-eng-10k-dev-3k"
+ds = load_dataset(dsn, split="train")
+dataset = ds["train"]
 
 dataset = ds
 

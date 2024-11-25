@@ -79,7 +79,7 @@ except IOError:
 
 
 from datasets import load_dataset
-dsn = "amuvarma/mls-eng-10k-dev-3k"
+dsn = "amuvarma/mls-eng-10k-500k"
 ds = load_dataset(dsn)
 
 
@@ -115,7 +115,7 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 
 from datasets import Dataset
 
-dataset = ds["dev"]
+dataset = ds["train"]
 
 
 def inference_collator(audio_input, ass_res, instruction="Transcribe the following \n<|audio|>"):
@@ -180,7 +180,7 @@ training_args = TrainingArguments(
     num_train_epochs=1,
     learning_rate=2e-3,  # Changed to 2*10^-3
     save_strategy="no",
-    logging_steps=6,
+    logging_steps=1,
     evaluation_strategy="no",
     report_to="wandb",
     push_to_hub=False,

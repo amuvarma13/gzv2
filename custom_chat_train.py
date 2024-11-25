@@ -66,7 +66,7 @@ model.resize_token_embeddings(len(tokenizer))
 import wandb
 wandb.init(
     project="colab-a100-40gb",
-    name = "vmllama3bchat-500k-8h100s-2"
+    name = "vmllama-speechchat-500k-8h100s-2"
     )
 
 file_path = 'transcribe_exps.txt'
@@ -81,7 +81,7 @@ except IOError:
 
 
 from datasets import load_dataset
-dsn = "amuvarma/mls-eng-10k-dev-3k"
+dsn = "amuvarma/mls-eng-10k-500k"
 ds = load_dataset(dsn)
 
 

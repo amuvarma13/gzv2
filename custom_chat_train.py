@@ -124,7 +124,7 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
     ).input_values
 
     user_phrase = "<|audio|>"
-    user_tokens = tokenizer(user_phrase, return_tensors="pt").input_ids
+    user_input_ids = tokenizer(user_phrase, return_tensors="pt").input_ids
     assistant_tokens = tokenizer(ass_res, return_tensors="pt").input_ids
 
     # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
@@ -133,7 +133,7 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
     end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
     final_tokens = torch.tensor([[128009]], dtype=torch.int64)
 
-    user_tokens = torch.cat([start_token, user_tokens, end_tokens], dim=1)
+    user_tokens = torch.cat([start_token, user_input_ids, end_tokens], dim=1)
 
 
     labels = torch.cat([start_token, user_tokens, end_tokens, assistant_tokens, final_tokens])

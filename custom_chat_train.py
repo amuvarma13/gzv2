@@ -220,6 +220,7 @@ print(trainer.model)
 
 trainer.model.save_pretrained(output_dir)
 
-from transformers import AutoModel
-loaded_model = AutoModel.from_pretrained(output_dir)
+from transformers import AutoModel, AutoConfig
+config = AutoConfig.from_pretrained(output_dir)
+loaded_model = AutoModel.from_pretrained(output_dir, config=config)
 print("loaded model", loaded_model)

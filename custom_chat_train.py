@@ -205,9 +205,11 @@ trainer = Trainer(
 
 print("training")
 
-trainer.train()
+# trainer.train()
 
 
 # Save model and tokenizer
 output_dir = "mymodel"
-trainer.save_model(output_dir)
+# trainer.save_model(output_dir)
+
+trainer.model.save_pretrained(output_dir)

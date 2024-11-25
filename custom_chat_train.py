@@ -124,20 +124,20 @@ def inference_collator(audio_input, ass_res, instruction="Transcribe the followi
     ).input_values
 
     user_phrase = "<|audio|>"
-    user_tokens = tokenizer.encode(user_phrase)
-    assistant_tokens = tokenizer.encode(ass_res)
+    user_tokens = tokenizer(user_phrase, return_tensors="pt").input_ids
+    assistant_tokens = tokenizer(ass_res, return_tensors="pt").input_ids
 
-    print("user_tokens", user_tokens)
+    # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
 
-    user_tokens = tokenizer.encode(user_phrase)
+    start_token = torch.tensor([[128259]], dtype=torch.int64)
+    end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
+    final_tokens = torch.tensor([[128009]], dtype=torch.int64)
 
-    # Adding the specified tokens at start and end
-    start_tokens = [128259, 128000]
-    end_tokens = [128009, 128260, 128261]
+    user_tokens = torch.cat([start_token, user_tokens, end_tokens], dim=1)
 
-    # Combine all tokens while keeping batch dimension
-    user_tokens = torch.tensor([start_tokens + user_tokens + end_tokens ])
-    labels = torch.tensor([start_tokens + user_tokens + end_tokens + assistant_tokens + [128009]])
+
+    labels = torch.cat([start_token, user_tokens, end_tokens, assistant_tokens, final_tokens])
+
     true_labels = torch.full_like(labels, -100)
     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
 

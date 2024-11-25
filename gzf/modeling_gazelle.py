@@ -444,7 +444,7 @@ GAZELLE_INPUTS_DOCSTRING = r"""
     GAZELLE_START_DOCSTRING,
 )
 class GazelleForConditionalGeneration(GazellePreTrainedModel):
-    def __init__(self, config: GazelleConfig):
+    def __init__(self, config: GazelleConfig, new_vocab_size=False):
         super().__init__(config)
         if config.audio_model_id is not None:
             self.audio_tower = AutoModel.from_pretrained(config.audio_model_id)
@@ -463,6 +463,8 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
             self.language_model = AutoModelForCausalLM.from_pretrained(
                 config.text_model_id, attn_implementation=config._attn_implementation
             )
+            if(new_vocab_size is not None):
+                self.language_model.resize_token_embeddings(134412)
         else:
             self.language_model = AutoModelForCausalLM.from_config(
                 config.text_config, attn_implementation=config._attn_implementation

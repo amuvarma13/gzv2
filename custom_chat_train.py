@@ -222,7 +222,7 @@ except Exception as e:
 print("Loading the model using GazelleForConditionalGeneration directly")
 try:
 
-    loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config)
+    loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
     print("Loaded model with custom class:", loaded_model_custom)
 except Exception as e:
     print("Error during model loading with GazelleForConditionalGeneration:", e)

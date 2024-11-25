@@ -31,7 +31,6 @@ elif torch.backends.mps.is_available():
 
 
 model_id = "amuvarma/convo-tts-tune-7contentonly"
-# model_id = "meta-llama/Llama-3.2-3B-Instruct"
 
 
 config = GazelleConfig(

@@ -84,6 +84,8 @@ ds = load_dataset(dsn)
 
 
 import torch
+
+print("moving model to", dtype)
 model = model.to(dtype=dtype)
 # First freeze all parameters
 for param in model.parameters():

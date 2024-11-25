@@ -202,8 +202,8 @@ print("Training")
 output_dir = "mymodel"
 print(trainer.model)
 
-trainer.model.save_pretrained(output_dir)
-tokenizer.save_pretrained(output_dir)  # It's good practice to save the tokenizer as well
+trainer.model.save_pretrained(output_dir, safe_serialization=True)
+# tokenizer.save_pretrained(output_dir)  # It's good practice to save the tokenizer as well
 
 # 19. Load the model using AutoModelForCausalLM
 print("Loading the model using AutoModelForCausalLM")

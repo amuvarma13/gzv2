@@ -115,10 +115,12 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 print("creating collator")
 
 
-def inference_collator(audio_input, user_res, ass_res):
+def inference_collator(audio_input, user_res, content_tokens, ass_res):
 
     user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
+
+    content_tensor = torch.tensor([content_tokens])
 
     # print("user_input_ids", user_input_ids.shape)
 
@@ -134,13 +136,16 @@ def inference_collator(audio_input, user_res, ass_res):
 
     start_token = torch.tensor([[128259]], dtype=torch.int64)
     end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
-    final_tokens = torch.tensor([[128009]], dtype=torch.int64)
+    final_tokens = torch.tensor([[128009, 128257]], dtype=torch.int64)
+    post_assistant_tokens = torch.tensor([[128258, 128262]])
+
+
 
     user_tokens = torch.cat(
         [system_tokens, start_token, user_input_ids, end_tokens], dim=1)
 
     labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
-                       assistant_input_ids, final_tokens], dim=1)
+                       assistant_input_ids, final_tokens, content_tensor, post_assistant_tokens], dim=1)
 
     true_labels = torch.full_like(labels, -100)
     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
@@ -170,9 +175,12 @@ class AudioChatDataCollator:
         assistant_response = features[0]["transcript"]
         user_response = features[0]["user"]
 
+        ##
+        content_tokens = features[0]["facodec_1"]
+
         user_response = "Read out the following: <|audio|>"
 
-        batch = inference_collator(audio, user_response, assistant_response)
+        batch = inference_collator(audio, user_response, content_tokens, assistant_response)
 
         return {
             "audio_values": batch["audio_values"].cpu(),

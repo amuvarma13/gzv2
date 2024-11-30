@@ -60,7 +60,7 @@ model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=speci
 
 for param in model.parameters():
     param.requires_grad = False
-    
+
 special_config = model.config
 wandb.init(
     project="colab-a100-40gb",
@@ -92,10 +92,10 @@ for param in model.parameters():
 
 # Then unfreeze just the multi_modal_projector
 # First set requires_grad
-for name, param in model.named_parameters():
-    if "multi_modal_projector" in name:
-        param.requires_grad = True
-        torch.nn.init.normal_(param, mean=0.0, std=0.02)
+# for name, param in model.named_parameters():
+#     if "multi_modal_projector" in name:
+#         param.requires_grad = True
+#         torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
 for name, param in model.named_parameters():

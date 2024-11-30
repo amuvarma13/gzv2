@@ -52,16 +52,19 @@ model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 
 tokenizer = transformers.AutoTokenizer.from_pretrained(
     "meta-llama/Llama-3.2-3B-Instruct")
-number_add_tokens = 6 * 1024 + 10
-new_tokens = [f"<custom_token_{i}>" for i in range(0, number_add_tokens + 1)]
-tokenizer.add_tokens(new_tokens)
-tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
-# Don't forget to resize model embeddings if you have a model:
-print("model device", model.device)
-model.resize_token_embeddings(len(tokenizer))
-print(model)
+# number_add_tokens = 6 * 1024 + 10
+# new_tokens = [f"<custom_token_{i}>" for i in range(0, number_add_tokens + 1)]
+# tokenizer.add_tokens(new_tokens)
+# tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
+# # Don't forget to resize model embeddings if you have a model:
+# print("model device", model.device)
+# model.resize_token_embeddings(len(tokenizer))
+# print(model)
 
-special_config = model.config
+# special_config = model.config
+
+
+
 wandb.init(
     project="colab-a100-40gb",
     name="r30-11llamaspeechcontentonlynocatformat-500k-8h100s-3"

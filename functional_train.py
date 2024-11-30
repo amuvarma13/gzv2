@@ -77,7 +77,7 @@ except IOError:
 
 
 from datasets import load_dataset
-dsn = "amuvarma/mls-eng-10k-500k"
+dsn = "amuvarma/proj-train-qa-and-speechqa"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
 
@@ -118,10 +118,7 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 print("creating collator")
 
 
-def inference_collator(audio_input, ass_res, instruction="Transcribe the following \n<|audio|>"):
-    audio_values = audio_processor(
-        audio=audio_input, return_tensors="pt", sampling_rate=16000
-    ).input_values
+def inference_collator(audio_input, ass_res):
 
     user_phrase = "<|audio|>"
     user_input_ids = tokenizer(user_phrase, return_tensors="pt").input_ids
@@ -160,18 +157,14 @@ print("creating data collator")
 
 import random
 class AudioChatDataCollator:
-    def __init__(self, instruction="Transcribe the following \n<|audio|>"):
-        self.instruction = instruction
+    def __init__(self):
+        self.greeting = "Hello world."
 
     def __call__(self, features):
         audio = torch.tensor([features[0]["audio"]["array"]])
         assistant_response = features[0]["transcript"]
 
-        random_expression = random.choice(expressions)
-
-
-
-        batch = inference_collator(audio, assistant_response, random_expression)
+        batch = inference_collator(audio, assistant_response)
 
         return {
             "audio_values": batch["audio_values"].cpu(),

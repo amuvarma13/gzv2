@@ -125,13 +125,13 @@ def inference_collator(audio_input, user_res, ass_res):
     # print("user_input_ids", user_input_ids.shape)
 
     # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
-    start_of_system = torch.tensor([[128256+8]])
-    end_of_system = torch.tensor([[128256+9]])
-    end_of_text = torch.tensor([[128009]])
+    start_of_system = torch.tensor([[128256+8]], dtype=torch.int64)
+    end_of_system = torch.tensor([[128256+9]], dtype=torch.int64)
+    end_of_text = torch.tensor([[128009]], dtype=torch.int64)
 
     system_message = "You are an AI assistant who will answer the user's questions and follow the user's instructions."
     system_input_ids = tokenizer(system_message, return_tensors="pt").input_ids
-    system_tokens = torch.cat([start_of_system, system_input_ids, end_of_text, end_of_system])
+    system_tokens = torch.cat([start_of_system, system_input_ids, end_of_text, end_of_system],  dim=1)
 
     start_token = torch.tensor([[128259]], dtype=torch.int64)
     end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)

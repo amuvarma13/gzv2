@@ -92,9 +92,9 @@ for param in model.parameters():
 
 # Then unfreeze just the multi_modal_projector
 # First set requires_grad
-# for name, param in model.named_parameters():
-#     if "multi_modal_projector" in name:
-#         param.requires_grad = True
+for name, param in model.named_parameters():
+    if "multi_modal_projector" in name:
+        param.requires_grad = True
 #         torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
@@ -144,10 +144,10 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
     user_tokens = torch.cat(
         [system_tokens, start_token, user_input_ids, end_tokens], dim=1)
 
-    # labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
-                    #    assistant_input_ids, final_tokens, content_tensor, post_assistant_tokens], dim=1)
     labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
-                       assistant_input_ids, final_tokens], dim=1)
+                      assistant_input_ids, final_tokens, content_tensor, post_assistant_tokens], dim=1)
+    # labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
+    #                    assistant_input_ids, final_tokens], dim=1)
 
     true_labels = torch.full_like(labels, -100)
     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
@@ -195,7 +195,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
-    learning_rate=0,  # Changed to 2*10^-3
+    learning_rate=2e-3,  # Changed to 2*10^-3
     # save_strategy="no",
     logging_steps=1,
     evaluation_strategy="no",

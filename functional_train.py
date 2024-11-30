@@ -122,7 +122,6 @@ def inference_collator(audio_input, user_res, ass_res):
     user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
 
-    print(user_input_ids.shape, user_input_ids)
 
     # print("user_input_ids", user_input_ids.shape)
 
@@ -172,6 +171,9 @@ class AudioChatDataCollator:
         audio = torch.tensor([features[0]["audio"]["array"]])
         assistant_response = features[0]["assistant"]
         user_response = features[0]["user"]
+
+        if "<|audio|>" not in user_response:
+            user_response = "<|audio|>"
 
         batch = inference_collator(audio, user_response, assistant_response)
 

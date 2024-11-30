@@ -37,34 +37,34 @@ elif torch.backends.mps.is_available():
     print(f"Using {device} device")
 
 
-model_id = "amuvarma/1-1-interleaved-text-content-tokens-1mn-samples-finetuned-1"
+tokenizer = transformers.AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-3B-Instruct")
+
+# 4. Add custom tokens
+number_add_tokens = 6 * 1024 + 10  # 6144 + 10 = 6154
+new_tokens = [f"<custom_token_{i}>" for i in range(0, number_add_tokens + 1)]  # 6155 tokens
+tokenizer.add_tokens(new_tokens)
+tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 
 
+model_id = "amuvarma/convo-tts-tune-7contentonly"
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h",
     text_model_id=model_id,
     audio_token_index=134411,
-    vocab_size=134411,
-
+    vocab_size=len(tokenizer),  # Updated vocab_size
 )
-
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
+special_config =  model.config
+output_dir = "amuvarma/e2e-1"
+model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
-tokenizer = transformers.AutoTokenizer.from_pretrained(
-    "meta-llama/Llama-3.2-3B-Instruct")
-number_add_tokens = 6 * 1024 + 10
-new_tokens = [f"<custom_token_{i}>" for i in range(0, number_add_tokens + 1)]
-tokenizer.add_tokens(new_tokens)
-tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
-# Don't forget to resize model embeddings if you have a model:
-print("model device", model.device)
-model.resize_token_embeddings(len(tokenizer))
-print(model)
+for param in model.parameters():
+    param.requires_grad = False
 
 special_config = model.config
 wandb.init(
     project="colab-a100-40gb",
-    name="r30-11llamaspeechcontentonlynocatformat-500k-8h100s-3"
+    name="r30-11"
 )
 
 file_path = 'transcribe_exps.txt'
@@ -78,7 +78,7 @@ except IOError:
     print(f"An error occurred while reading the file {file_path}.")
 
 
-dsn = "amuvarma/proj-train-qa-and-speechqa"
+dsn = "amuvarma/1k-raw-wfac"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
 
@@ -92,6 +92,10 @@ for param in model.parameters():
 
 # Then unfreeze just the multi_modal_projector
 # First set requires_grad
+# for name, param in model.named_parameters():
+#     if "multi_modal_projector" in name:
+#         param.requires_grad = True
+#         torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
 for name, param in model.named_parameters():
@@ -113,7 +117,7 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 print("creating collator")
 
 
-def inference_collator(audio_input, user_res, ass_res):
+def inference_collator(audio_input, user_res, ass_res, content_tokens):
 
     user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
@@ -125,6 +129,8 @@ def inference_collator(audio_input, user_res, ass_res):
     end_of_system = torch.tensor([[128256+9]], dtype=torch.int64)
     end_of_text = torch.tensor([[128009]], dtype=torch.int64)
 
+    content_tensor = torch.tensor([content_tokens], dtype=torch.int64)
+
     system_message = "You are an AI assistant who will answer the user's questions and follow the user's instructions."
     system_input_ids = tokenizer(system_message, return_tensors="pt").input_ids
     system_tokens = torch.cat(
@@ -132,13 +138,14 @@ def inference_collator(audio_input, user_res, ass_res):
 
     start_token = torch.tensor([[128259]], dtype=torch.int64)
     end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
-    final_tokens = torch.tensor([[128009]], dtype=torch.int64)
+    final_tokens = torch.tensor([[128009, 128257 ]], dtype=torch.int64)
+    post_assistant_tokens = torch.tensor([[128258, 128262]])
 
     user_tokens = torch.cat(
         [system_tokens, start_token, user_input_ids, end_tokens], dim=1)
 
     labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
-                       assistant_input_ids, final_tokens], dim=1)
+                       assistant_input_ids, final_tokens, content_tensor, post_assistant_tokens], dim=1)
 
     true_labels = torch.full_like(labels, -100)
     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
@@ -165,11 +172,8 @@ class AudioChatDataCollator:
 
     def __call__(self, features):
         audio = torch.tensor([features[0]["audio"]["array"]])
-        assistant_response = features[0]["assistant"]
-        user_response = features[0]["user"]
-
-        if "<|audio|>" not in user_response:
-            user_response = "<|audio|>"
+        assistant_response = features[0]["transcript"]
+        user_response = "Read out the following <|audio|>"
 
         batch = inference_collator(audio, user_response, assistant_response)
 
@@ -188,7 +192,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
-    learning_rate=2e-3,  # Changed to 2*10^-3
+    learning_rate=0,  # Changed to 2*10^-3
     # save_strategy="no",
     logging_steps=1,
     evaluation_strategy="no",

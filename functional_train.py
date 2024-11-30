@@ -64,7 +64,7 @@ print(model)
 special_config = model.config
 wandb.init(
     project="colab-a100-40gb",
-    name="vmllamaspeechcontentonly-500k-8h100s-3"
+    name="r30-11llamaspeechcontentonlynocatformat-500k-8h100s-3"
 )
 
 file_path = 'transcribe_exps.txt'

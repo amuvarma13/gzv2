@@ -117,10 +117,9 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 print("creating collator")
 
 
-def inference_collator(audio_input, ass_res):
+def inference_collator(audio_input, user_res, ass_res):
 
-    user_phrase = "<|audio|>"
-    user_input_ids = tokenizer(user_phrase, return_tensors="pt").input_ids
+    user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
 
     # print("user_input_ids", user_input_ids.shape)
@@ -169,9 +168,10 @@ class AudioChatDataCollator:
 
     def __call__(self, features):
         audio = torch.tensor([features[0]["audio"]["array"]])
-        assistant_response = features[0]["transcript"]
+        assistant_response = features[0]["assistant"]
+        user_response = features[0]["user"]
 
-        batch = inference_collator(audio, assistant_response)
+        batch = inference_collator(audio, user_response, assistant_response)
 
         return {
             "audio_values": batch["audio_values"].cpu(),

@@ -58,7 +58,9 @@ special_config =  model.config
 output_dir = "amuvarma/e2e-1"
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
-
+for param in model.parameters():
+    param.requires_grad = False
+    
 special_config = model.config
 wandb.init(
     project="colab-a100-40gb",

@@ -122,6 +122,8 @@ def inference_collator(audio_input, user_res, ass_res):
     user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
 
+    print(user_input_ids.shape, user_input_ids)
+
     # print("user_input_ids", user_input_ids.shape)
 
     # input_ids = tokenizer(prompt, return_tensors="pt").input_ids

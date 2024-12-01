@@ -16,6 +16,7 @@ from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 dsn = "amuvarma/60k-fac-with-audio-1dups"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
+ds = ds.select(range(0, 5000))
 
 from gzf import (
     GazelleConfig,
@@ -200,7 +201,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
-    learning_rate=2e-5,  # Changed to 2*10^-3
+    learning_rate=2e-4,  # Changed to 2*10^-3
     # save_strategy="no",
     logging_steps=1,
     evaluation_strategy="no",

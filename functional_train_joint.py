@@ -78,9 +78,9 @@ except IOError:
     print(f"An error occurred while reading the file {file_path}.")
 
 
-dsn = "amuvarma/20k-raw-fac-1dups"
+dsn = "amuvarma/60k-fac-with-audio-1dups"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
-ds = load_dataset(dsn, split="vm_3")
+ds = load_dataset(dsn, split="train")
 
 dataset = ds
 

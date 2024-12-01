@@ -112,8 +112,8 @@ trainable_params = sum(p.numel()
                        for p in model.parameters() if p.requires_grad)
 all_params = sum(p.numel() for p in model.parameters())
 
-print(f"\nTrainable parameters: {trainable_params:,}")
-print(f"All parameters: {all_params:,}")
+# print(f"\nTrainable parameters: {trainable_params:,}")
+# print(f"All parameters: {all_params:,}")
 
 audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
     "facebook/wav2vec2-base-960h"

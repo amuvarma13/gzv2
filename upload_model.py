@@ -2,7 +2,7 @@ from huggingface_hub import HfApi
 import os
 
 
-base_repo_id = "models__joint/checkpoint-625"
+base_repo_id = "models_joint/checkpoint-625"
 upload_name = "amuvarma/e2e-2-joint"
 
 

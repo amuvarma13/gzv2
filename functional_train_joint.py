@@ -104,16 +104,16 @@ for name, param in model.named_parameters():
 #         torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
-for name, param in model.named_parameters():
-    if param.requires_grad:
-        print(f"Trainable: {name} - {param.shape}")
+# for name, param in model.named_parameters():
+#     if param.requires_grad:
+#         print(f"Trainable: {name} - {param.shape}")
 
 trainable_params = sum(p.numel()
                        for p in model.parameters() if p.requires_grad)
 all_params = sum(p.numel() for p in model.parameters())
 
-# print(f"\nTrainable parameters: {trainable_params:,}")
-# print(f"All parameters: {all_params:,}")
+print(f"\nTrainable parameters: {trainable_params:,}")
+print(f"All parameters: {all_params:,}")
 
 audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
     "facebook/wav2vec2-base-960h"

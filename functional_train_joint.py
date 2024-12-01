@@ -64,7 +64,7 @@ for param in model.parameters():
 special_config = model.config
 wandb.init(
     project="colab-a100-40gb",
-    name="r30-11"
+    name="r31-11"
 )
 
 file_path = 'transcribe_exps.txt'

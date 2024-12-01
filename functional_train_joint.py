@@ -224,7 +224,6 @@ trainer.train()
 # Save model and tokenizer
 output_dir = "mymodel"
 # trainer.save_model(output_dir)
-print(trainer.model)
 
 trainer.model.save_pretrained(output_dir, safe_serialization=True)
 

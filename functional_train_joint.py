@@ -86,8 +86,7 @@ dataset = ds
 
 
 model = model.to(dtype=dtype)
-print("my model", model)
-break
+
 # First freeze all parameters
 for param in model.parameters():
     param.requires_grad = False
@@ -96,6 +95,8 @@ for param in model.parameters():
 # First set requires_grad
 for name, param in model.named_parameters():
     if "multi_modal_projector" in name:
+        param.requires_grad = True
+    if "language_model" in name:
         param.requires_grad = True
 #         torch.nn.init.normal_(param, mean=0.0, std=0.02)
 

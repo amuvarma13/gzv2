@@ -16,7 +16,7 @@ from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 dsn = "amuvarma/60k-fac-with-audio-1dups"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
-ds = ds.select(range(0, 5000))
+ds = ds.select(range(5000, 10000))
 
 from gzf import (
     GazelleConfig,

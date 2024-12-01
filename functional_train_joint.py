@@ -55,7 +55,8 @@ config = GazelleConfig(
 )
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 special_config =  model.config
-output_dir = "amuvarma/e2e-1"
+# output_dir = "amuvarma/e2e-1"
+output_dir = "models_llm/checkpoint-937"
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
 for param in model.parameters():
@@ -96,8 +97,8 @@ for param in model.parameters():
 for name, param in model.named_parameters():
     if "multi_modal_projector" in name:
         param.requires_grad = True
-    # if "language_model" in name:
-    #     param.requires_grad = True
+    if "language_model" in name:
+        param.requires_grad = True
 #         torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
@@ -194,7 +195,7 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./models_llm",
+    output_dir="./models_joint",
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
@@ -225,7 +226,7 @@ trainer.train()
 
 
 # Save model and tokenizer
-output_dir = "mymodel_llm"
+output_dir = "mymodel_joint"
 # trainer.save_model(output_dir)
 
 trainer.model.save_pretrained(output_dir, safe_serialization=True)

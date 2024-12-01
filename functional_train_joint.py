@@ -79,7 +79,7 @@ except IOError:
     print(f"An error occurred while reading the file {file_path}.")
 
 
-dsn = "amuvarma/40k-fac-with-audio-1dups"
+dsn = "amuvarma/60k-fac-with-audio-1dups"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
 
@@ -95,8 +95,8 @@ for param in model.parameters():
 # Then unfreeze just the multi_modal_projector
 # First set requires_grad
 for name, param in model.named_parameters():
-    if "multi_modal_projector" in name:
-        param.requires_grad = True
+    # if "multi_modal_projector" in name:
+    #     param.requires_grad = True
     if "language_model" in name:
         param.requires_grad = True
 #         torch.nn.init.normal_(param, mean=0.0, std=0.02)

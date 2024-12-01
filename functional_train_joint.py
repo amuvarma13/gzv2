@@ -80,7 +80,7 @@ except IOError:
 
 dsn = "amuvarma/20k-raw-fac-1dups"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
-ds = load_dataset(dsn, split="train")
+ds = load_dataset(dsn, split="vm_3")
 
 dataset = ds
 

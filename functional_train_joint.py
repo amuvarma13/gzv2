@@ -86,6 +86,8 @@ dataset = ds
 
 
 model = model.to(dtype=dtype)
+print("my model", model)
+break
 # First freeze all parameters
 for param in model.parameters():
     param.requires_grad = False

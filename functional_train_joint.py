@@ -194,7 +194,7 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./models",
+    output_dir="./models__",
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
@@ -225,7 +225,7 @@ trainer.train()
 
 
 # Save model and tokenizer
-output_dir = "mymodel"
+output_dir = "mymodel__"
 # trainer.save_model(output_dir)
 
 trainer.model.save_pretrained(output_dir, safe_serialization=True)

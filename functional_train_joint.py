@@ -55,7 +55,7 @@ config = GazelleConfig(
 )
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 special_config =  model.config
-output_dir = "./models/checkpoint-312"
+output_dir = "amuvarma/e2e-1"
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
 for param in model.parameters():
@@ -94,8 +94,8 @@ for param in model.parameters():
 # Then unfreeze just the multi_modal_projector
 # First set requires_grad
 for name, param in model.named_parameters():
-    if "multi_modal_projector" in name:
-        param.requires_grad = True
+    # if "multi_modal_projector" in name:
+    #     param.requires_grad = True
     if "language_model" in name:
         param.requires_grad = True
 #         torch.nn.init.normal_(param, mean=0.0, std=0.02)

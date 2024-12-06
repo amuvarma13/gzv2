@@ -2,7 +2,7 @@ from huggingface_hub import HfApi
 import os
 
 
-base_repo_id = "models_joint/checkpoint-10000"
+base_repo_id = "models/checkpoint-10000"
 upload_name = "amuvarma/projector-train-checkpoint-10000"
 
 

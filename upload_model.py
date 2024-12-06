@@ -2,8 +2,8 @@ from huggingface_hub import HfApi
 import os
 
 
-base_repo_id = "models_joint/checkpoint-78"
-upload_name = "amuvarma/e2e-3-joint"
+base_repo_id = "models_joint/checkpoint-10000"
+upload_name = "amuvarma/projector-train-checkpoint-10000"
 
 
 def push_folder_to_hub(local_folder, repo_id, commit_message="Update model"):

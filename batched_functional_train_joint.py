@@ -74,7 +74,7 @@ for param in model.parameters():
 
 special_config = model.config
 wandb.init(
-    project="colab-a100-40gb",
+    project="gazelle-tune-llm",
     name="r31-11"
 )
 

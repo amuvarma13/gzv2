@@ -2,6 +2,9 @@ import random
 from datasets import load_dataset
 import wandb
 from datasets import Dataset
+from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
+from torch.utils.data.distributed import DistributedSampler
 
 
 from transformers import Wav2Vec2Config, LlamaConfig
@@ -13,16 +16,19 @@ from transformers import CONFIG_MAPPING
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
-dsn = "amuvarma/60k-fac-with-audio-1dups"
-# dsn = "amuvarma/mls-eng-10k-dev-3k"
-ds = load_dataset(dsn, split="train")
-ds = ds.select(range(5000, 10000))
+dsn1 = "amuvarma/voice-assistant-10k-processed-1"
+dsn2 = "amuvarma/voice-assistant-10k-processed-1"
+dsn1 = load_dataset(dsn1, split="train")
+dsn2 = load_dataset(dsn2, split="train")
 
 from gzf import (
     GazelleConfig,
     GazelleForConditionalGeneration,
     GazelleProcessor,
 )
+
+batch_size = 1
+number_processes = 1
 
 MODEL_FOR_CAUSAL_LM_MAPPING.register(
     "gazelle", GazelleForConditionalGeneration)
@@ -60,7 +66,7 @@ config = GazelleConfig(
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 special_config =  model.config
 # output_dir = "amuvarma/e2e-1"
-output_dir = "models_llm/checkpoint-78"
+output_dir = "amuvarma/projector-train-checkpoint-14374"
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
 for param in model.parameters():
@@ -85,7 +91,77 @@ except IOError:
 
 
 
-dataset = ds
+
+
+class BatchedAlternatingDataset(Dataset):
+    def __init__(self, dataset1, dataset2, batch_total):
+        self.dataset1 = dataset1
+        self.dataset2 = dataset2
+        self.batch_total = batch_total
+        self.length = 2 * min(len(dataset1), len(dataset2))
+        
+    def __len__(self):
+        return self.length
+    
+    def __getitem__(self, index):
+        super_batch = index // (2 * self.batch_total)
+        
+        position_in_super_batch = index % (2 * self.batch_total)
+        
+        if position_in_super_batch < self.batch_total:
+            dataset_index = super_batch * self.batch_total + position_in_super_batch
+            # print(f"returning from dataset1: {dataset_index}")
+            return self.dataset1[dataset_index]
+        else:
+            dataset_index = super_batch * self.batch_total + (position_in_super_batch - self.batch_total)
+            # print(f"returning from dataset2: {dataset_index}")
+            return self.dataset2[dataset_index]
+
+class AlternatingDistributedSampler(DistributedSampler):
+    def __init__(self, dataset, num_replicas=None, rank=None, shuffle=False):
+        super().__init__(dataset, num_replicas=num_replicas, rank=rank, shuffle=shuffle)
+        self.shuffle = shuffle
+
+    def __iter__(self):
+        indices = list(range(len(self.dataset)))
+        indices = indices[self.rank:self.total_size:self.num_replicas]
+        return iter(indices)
+
+
+class FSDPTrainer(Trainer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.repo_id = base_repo_id
+        self.api = HfApi()
+    
+    def get_train_dataloader(self):
+        sampler = AlternatingDistributedSampler(
+            self.train_dataset,
+            num_replicas=torch.distributed.get_world_size(),
+            rank=torch.distributed.get_rank(),
+            shuffle=False, 
+        )
+
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.args.per_device_train_batch_size,
+            sampler=sampler,
+            collate_fn=self.data_collator,
+            drop_last=self.args.dataloader_drop_last,
+            num_workers=0,
+            pin_memory=self.args.dataloader_pin_memory,
+        )
+    
+    def log(self, logs):
+        super().log(logs)
+        global_step = self.state.global_step
+        if global_step % 2 == 0:
+            wandb.log({"text_loss": logs["loss"], "step": global_step})
+        else:
+            wandb.log({"audio_loss": logs["loss"], "step": global_step})
+
+batch_total = number_processes * batch_size
+train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
 
 
 model = model.to(dtype=dtype)
@@ -226,7 +302,7 @@ training_args = TrainingArguments(
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=dataset,
+    train_dataset=train_dataset,
     data_collator=AudioChatDataCollator(),
 )
 

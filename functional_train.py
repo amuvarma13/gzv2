@@ -67,7 +67,7 @@ tokenizer = transformers.AutoTokenizer.from_pretrained(
 
 wandb.init(
     project="colab-a100-40gb",
-    name="r30-11llamaspeechcontentonlynocatformat-500k-8h100s-3"
+    name="5-12"
 )
 
 file_path = 'transcribe_exps.txt'

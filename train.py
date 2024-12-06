@@ -63,8 +63,8 @@ print(model)
 
 import wandb
 wandb.init(
-    project="colab-a100-40gb",
-    name = "vmllama3bchat-500k-8h100s-2"
+    project="projection-layer",
+    name = "wav2vec-2linear"
     )
 
 file_path = 'transcribe_exps.txt'

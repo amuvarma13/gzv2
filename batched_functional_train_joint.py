@@ -16,7 +16,7 @@ from transformers import CONFIG_MAPPING
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
-dsn1 = "amuvarma/voice-assistant-10k-processed-1"
+dsn1 = "amuvarma/10k-tune-audio-text_answer"
 dsn2 = "amuvarma/10k-audio-audio-contentonly"
 ds1 = load_dataset(dsn1, split="train")
 ds2 = load_dataset(dsn2, split="train")
@@ -264,9 +264,11 @@ class AudioChatDataCollator:
 
     def __call__(self, features):
         audio = torch.tensor([features[0]["audio"]["array"]])
-        assistant_response = features[0]["transcript"]
+        assistant_response = features[0]["answer"]
         user_response = "<|audio|>"
-        content_tokens = features[0]["facodec_1"]
+        content_tokens = []
+        if("facodec_1" in features[0]):
+            content_tokens = features[0]["facodec_1"]
 
         batch = inference_collator(audio, user_response, assistant_response, content_tokens)
 

@@ -17,7 +17,7 @@ from transformers import CONFIG_MAPPING
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
 dsn1 = "amuvarma/voice-assistant-10k-processed-1"
-dsn2 = "amuvarma/voice-assistant-10k-processed-1"
+dsn2 = "amuvarma/10k-audio-audio-contentonly"
 dsn1 = load_dataset(dsn1, split="train")
 dsn2 = load_dataset(dsn2, split="train")
 
@@ -27,8 +27,8 @@ from gzf import (
     GazelleProcessor,
 )
 
-batch_size = 1
-number_processes = 1
+batch_size = 8
+number_processes = 2
 
 MODEL_FOR_CAUSAL_LM_MAPPING.register(
     "gazelle", GazelleForConditionalGeneration)

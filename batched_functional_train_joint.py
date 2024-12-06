@@ -286,7 +286,7 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./models_joint",
+    output_dir="./models-llm",
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,

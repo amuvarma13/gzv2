@@ -264,7 +264,7 @@ class AudioChatDataCollator:
 
     def __call__(self, features):
         audio = torch.tensor([features[0]["audio"]["array"]])
-        assistant_response = features[0]["answer"]
+        assistant_response = features[0]["assistant_response"]
         user_response = "<|audio|>"
         content_tokens = []
         if("facodec_1" in features[0]):

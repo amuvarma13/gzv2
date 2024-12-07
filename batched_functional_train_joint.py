@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from torch.utils.data.distributed import DistributedSampler
 
+import tdqm
 
 from transformers import Wav2Vec2Config, LlamaConfig
 import torch
@@ -163,7 +164,27 @@ class FSDPTrainer(Trainer):
 batch_total = number_processes * batch_size
 # train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
 
-train_dataset = ds1
+
+def remove_short_audio(dataset, min_seconds=1.0):
+    indices_to_keep = []
+
+    for i, example in tqdm(enumerate(dataset), total=len(dataset)):
+        audio = example['question_audio']
+        duration = len(audio['array']) / audio['sampling_rate']
+        if duration >= min_seconds:
+            indices_to_keep.append(i)
+
+    filtered_dataset = dataset.select(indices_to_keep)
+
+    return filtered_dataset
+
+filtered_ds = remove_short_audio(ds1)
+
+train_dataset = filtered_ds
+
+
+
+print(train_dataset)
 
 
 model = model.to(dtype=dtype)

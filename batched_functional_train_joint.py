@@ -163,7 +163,7 @@ class FSDPTrainer(Trainer):
 batch_total = number_processes * batch_size
 # train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
 
-train_dataset = ds2
+train_dataset = ds1
 
 
 model = model.to(dtype=dtype)

@@ -5,7 +5,7 @@ from datasets import Dataset
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from torch.utils.data.distributed import DistributedSampler
-
+from tqdm import tqdm
 
 from transformers import Wav2Vec2Config, LlamaConfig
 import torch
@@ -19,6 +19,22 @@ from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 dsn1 = "amuvarma/voice-assistant-200k-processed-1"
 # dsn2 = "amuvarma/10k-audio-audio-contentonly"
 ds1 = load_dataset(dsn1, split="train")
+def remove_short_audio(dataset, min_seconds=1.0):
+    indices_to_keep = []
+
+    for i, example in tqdm(enumerate(dataset), total=len(dataset)):
+        audio = example['question_audio']
+        duration = len(audio['array']) / audio['sampling_rate']
+        if duration >= min_seconds:
+            indices_to_keep.append(i)
+
+    filtered_dataset = dataset.select(indices_to_keep)
+
+    return filtered_dataset
+
+filtered_ds = remove_short_audio(ds1)
+
+train_dataset = filtered_ds
 # ds2 = load_dataset(dsn2, split="train")
 
 from gzf import (
@@ -164,22 +180,7 @@ batch_total = number_processes * batch_size
 # train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
 
 
-def remove_short_audio(dataset, min_seconds=1.0):
-    indices_to_keep = []
 
-    for i, example in tqdm(enumerate(dataset), total=len(dataset)):
-        audio = example['question_audio']
-        duration = len(audio['array']) / audio['sampling_rate']
-        if duration >= min_seconds:
-            indices_to_keep.append(i)
-
-    filtered_dataset = dataset.select(indices_to_keep)
-
-    return filtered_dataset
-
-filtered_ds = remove_short_audio(ds1)
-
-train_dataset = filtered_ds
 
 
 

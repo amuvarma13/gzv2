@@ -11,7 +11,7 @@ def push_folder_to_hub(local_folder, repo_id, commit_message="Update model"):
 
     try:
         api.create_repo(repo_id=repo_id, exist_ok=True)
-    except Exception as e:
+    except Exception as e: 
         print(f"Error creating repository: {e}")
         return None
 

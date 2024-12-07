@@ -201,7 +201,65 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 print("creating collator")
 
 
-def inference_collator(audio_input, user_res, ass_res, content_tokens):
+# def inference_collator(audio_input, user_res, ass_res, content_tokens):
+
+#     user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
+#     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
+
+#     # print("user_input_ids", user_input_ids.shape)
+
+#     # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
+#     start_of_system = torch.tensor([[128256+8]], dtype=torch.int64)
+#     end_of_system = torch.tensor([[128256+9]], dtype=torch.int64)
+#     end_of_text = torch.tensor([[128009]], dtype=torch.int64)
+
+#     content_tensor = torch.tensor([content_tokens], dtype=torch.int64)
+#     content_tensor = content_tensor + 128266
+
+#     system_message = "You are an AI assistant who will answer the user's questions and follow the user's instructions."
+#     system_input_ids = tokenizer(system_message, return_tensors="pt").input_ids
+#     system_tokens = torch.cat(
+#         [start_of_system, system_input_ids, end_of_text, end_of_system],  dim=1)
+
+#     start_token = torch.tensor([[128259]], dtype=torch.int64)
+#     end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
+#     final_tokens = torch.tensor([[128009, 128257 ]], dtype=torch.int64)
+#     post_assistant_tokens = torch.tensor([[128258, 128262]])
+
+#     user_tokens = torch.cat(
+#         [system_tokens, start_token, user_input_ids, end_tokens], dim=1)
+
+
+    
+#     if len(content_tokens):
+#             labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
+#                       assistant_input_ids, final_tokens, content_tensor, post_assistant_tokens], dim=1)
+            
+#     else:
+#         labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
+#                       assistant_input_ids, final_tokens], dim=1)
+
+#     # labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
+#     #                    assistant_input_ids, final_tokens], dim=1)
+
+#     true_labels = torch.full_like(labels, -100)
+#     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
+
+#     # print("true_labels", true_labels)
+#     # print("input_ids", labels)
+
+#     attention_mask = torch.ones_like(labels)
+
+#     return {
+#         "audio_values": audio_input.to(model.device).to(model.dtype),
+#         "input_ids": labels.to(model.device),
+#         "labels": true_labels.to(model.device),
+#         "attention_mask": attention_mask.to(model.device)
+#     }
+
+
+#************************************************************
+def inference_collator(audio_input, user_res, ass_res):
 
     user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
@@ -213,9 +271,6 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
     end_of_system = torch.tensor([[128256+9]], dtype=torch.int64)
     end_of_text = torch.tensor([[128009]], dtype=torch.int64)
 
-    content_tensor = torch.tensor([content_tokens], dtype=torch.int64)
-    content_tensor = content_tensor + 128266
-
     system_message = "You are an AI assistant who will answer the user's questions and follow the user's instructions."
     system_input_ids = tokenizer(system_message, return_tensors="pt").input_ids
     system_tokens = torch.cat(
@@ -223,24 +278,13 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
 
     start_token = torch.tensor([[128259]], dtype=torch.int64)
     end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
-    final_tokens = torch.tensor([[128009, 128257 ]], dtype=torch.int64)
-    post_assistant_tokens = torch.tensor([[128258, 128262]])
+    final_tokens = torch.tensor([[128009]], dtype=torch.int64)
 
     user_tokens = torch.cat(
         [system_tokens, start_token, user_input_ids, end_tokens], dim=1)
 
-
-    
-    if len(content_tokens):
-            labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
-                      assistant_input_ids, final_tokens, content_tensor, post_assistant_tokens], dim=1)
-            
-    else:
-        labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
-                      assistant_input_ids, final_tokens], dim=1)
-
-    # labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
-    #                    assistant_input_ids, final_tokens], dim=1)
+    labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
+                       assistant_input_ids, final_tokens], dim=1)
 
     true_labels = torch.full_like(labels, -100)
     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
@@ -257,6 +301,7 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
         "attention_mask": attention_mask.to(model.device)
     }
 
+#************************************************************
 
 print("creating data collator")
 
@@ -266,8 +311,8 @@ class AudioChatDataCollator:
         self.greeting = "Hello world."
 
     def __call__(self, features):
-        audio = torch.tensor([features[0]["audio"]["array"]])
-        assistant_response = features[0]["assistant_response"]
+        audio = torch.tensor([features[0]["question_audio"]["array"]])
+        assistant_response = features[0]["answer"]
         user_response = "<|audio|>"
         content_tokens = []
         if("facodec_1" in features[0]):
@@ -286,7 +331,7 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./models-llm",
+    output_dir="./models",
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,

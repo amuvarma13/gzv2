@@ -161,9 +161,9 @@ class FSDPTrainer(Trainer):
             wandb.log({"audio_loss": logs["loss"], "step": global_step})
 
 batch_total = number_processes * batch_size
-train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
+# train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
 
-# train_dataset = ds2
+train_dataset = ds2
 
 
 model = model.to(dtype=dtype)

@@ -91,7 +91,7 @@ for param in model.parameters():
 special_config = model.config
 wandb.init(
     project="gazelle-tune-llm",
-    name="r6-12"
+    name="r7-12"
 )
 
 file_path = 'transcribe_exps.txt'
@@ -200,7 +200,6 @@ for name, param in model.named_parameters():
     #     param.requires_grad = True
     if "language_model" in name:
         param.requires_grad = True
-        torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
 # for name, param in model.named_parameters():

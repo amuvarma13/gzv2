@@ -16,7 +16,7 @@ from transformers import CONFIG_MAPPING
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
-dsn1 = "amuvarma/10k-audio-audio-contentonly"
+dsn1 = "amuvarma/10k-stts-duplex-convos-raw-fac"
 # dsn2 = "amuvarma/10k-audio-audio-contentonly"
 ds1 = load_dataset(dsn1, split="train")
 def remove_short_audio(dataset, min_seconds=1.0):
@@ -196,11 +196,11 @@ for param in model.parameters():
 # Then unfreeze just the multi_modal_projector
 # First set requires_grad
 for name, param in model.named_parameters():
-    if "multi_modal_projector" in name:
+    # if "multi_modal_projector" in name:
+    #     param.requires_grad = True
+    if "language_model" in name:
         param.requires_grad = True
-    # if "language_model" in name:
-        # param.requires_grad = True
-#         torch.nn.init.normal_(param, mean=0.0, std=0.02)
+        torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
 # for name, param in model.named_parameters():
@@ -356,7 +356,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
-    learning_rate=2e-4,  # Changed to 2*10^-3
+    learning_rate=2e-5,  # Changed to 2*10^-3
     # save_strategy="no",
     logging_steps=1,
     evaluation_strategy="no",

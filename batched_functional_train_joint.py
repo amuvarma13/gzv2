@@ -177,7 +177,7 @@ for param in model.parameters():
 for name, param in model.named_parameters():
     # if "multi_modal_projector" in name:
     #     param.requires_grad = True
-    if "language_model" in name:
+    # if "language_model" in name:
         param.requires_grad = True
 #         torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
@@ -290,7 +290,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
-    learning_rate=2e-7,  # Changed to 2*10^-3
+    learning_rate=2e-6,  # Changed to 2*10^-3
     # save_strategy="no",
     logging_steps=1,
     evaluation_strategy="no",

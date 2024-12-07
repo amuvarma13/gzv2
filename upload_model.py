@@ -2,7 +2,7 @@ from huggingface_hub import HfApi
 import os
 
 
-base_repo_id = "models-llm/checkpoint-3098"
+base_repo_id = "models/checkpoint-3098"
 upload_name = "amuvarma/llm-train-tune-voiceassistant-checkpoint-3098"
 
 

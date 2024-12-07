@@ -318,7 +318,7 @@ class AudioChatDataCollator:
         if("facodec_1" in features[0]):
             content_tokens = features[0]["facodec_1"]
 
-        batch = inference_collator(audio, user_response, assistant_response, content_tokens)
+        batch = inference_collator(audio, user_response, assistant_response)
 
         return {
             "audio_values": batch["audio_values"].cpu(),

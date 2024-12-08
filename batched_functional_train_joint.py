@@ -167,10 +167,14 @@ class FSDPTrainer(Trainer):
             num_workers=0,
             pin_memory=self.args.dataloader_pin_memory,
         )
-    
     def log(self, logs):
         super().log(logs)
         global_step = self.state.global_step
+        
+        # Check if loss exists in logs
+        if "loss" not in logs:
+            return  # Skip logging if there's no loss
+            
         if global_step % 2 == 0:
             wandb.log({"text_loss": logs["loss"], "step": global_step})
         else:

@@ -199,11 +199,11 @@ for param in model.parameters():
 
 # Then unfreeze just the multi_modal_projector
 # First set requires_grad
-# for name, param in model.named_parameters():
-#     # if "multi_modal_projector" in name:
-#     #     param.requires_grad = True
-#     if "language_model" in name:
-#         param.requires_grad = True
+for name, param in model.named_parameters():
+    # if "multi_modal_projector" in name:
+    #     param.requires_grad = True
+    if "language_model" in name:
+        param.requires_grad = True
 
 # Print to verify
 # for name, param in model.named_parameters():

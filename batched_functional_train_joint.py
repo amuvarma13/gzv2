@@ -92,7 +92,7 @@ for param in model.parameters():
 
 special_config = model.config
 wandb.init(
-    project="gazelle-tune-llm-alt",
+    project="gazelle-tune-llm-alt-conts",
     name="r7-12-2"
 )
 

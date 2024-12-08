@@ -3,7 +3,7 @@ import os
 
 
 base_repo_id = "modelsaltbatch/checkpoint-831"
-upload_name = "amuvarma/altbatch-llm-train-tune-voiceassistant-checkpoint-831"
+upload_name = "amuvarma/altbatch-2-llm-train-tune-voiceassistant-checkpoint-831"
 
 
 def push_folder_to_hub(local_folder, repo_id, commit_message="Update model"):

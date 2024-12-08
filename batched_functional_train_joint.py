@@ -45,7 +45,7 @@ from gzf import (
     GazelleProcessor,
 )
 
-batch_size = 8
+batch_size = 1
 number_processes = 8
 
 MODEL_FOR_CAUSAL_LM_MAPPING.register(
@@ -122,25 +122,23 @@ class BatchedAlternatingDataset(Dataset):
         return self.length
     
     def __getitem__(self, index):
-        # Calculate which dataset we should pull from
-        is_dataset1 = (index // self.batch_total) % 2 == 0
+        print(f"returning from dataset: {index}")  
+        super_batch = index // (2 * self.batch_total)
         
-        # Calculate the actual index within the dataset
-        relative_index = index % self.batch_total
-        base_index = (index // (2 * self.batch_total)) * self.batch_total
-        dataset_index = base_index + relative_index
+        position_in_super_batch = index % (2 * self.batch_total)
         
-        # Ensure we don't exceed dataset bounds
-        dataset_index = min(dataset_index, len(self.dataset1)-1 if is_dataset1 else len(self.dataset2)-1)
-        
-        # Return from appropriate dataset
-        if is_dataset1:
+        if position_in_super_batch < self.batch_total:
+            dataset_index = super_batch * self.batch_total + position_in_super_batch
+            # print(f"returning from dataset1: {dataset_index}")
             return self.dataset1[dataset_index]
         else:
+            dataset_index = super_batch * self.batch_total + (position_in_super_batch - self.batch_total)
+            # print(f"returning from dataset2: {dataset_index}")
             return self.dataset2[dataset_index]
+
 class AlternatingDistributedSampler(DistributedSampler):
     def __init__(self, dataset, num_replicas=None, rank=None, shuffle=False):
-        super().__init__(dataset, num_replicas=num_replicas, rank=rank, shuffle=shuffle)
+        super().__init__(dataset, num_replicas=num_replicas, rank=rank, shuffle=False)
         self.shuffle = shuffle
 
     def __iter__(self):

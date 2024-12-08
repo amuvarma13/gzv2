@@ -2,8 +2,8 @@ from huggingface_hub import HfApi
 import os
 
 
-base_repo_id = "modelsjoint/checkpoint-78"
-upload_name = "amuvarma/joint-llm-train-tune-voiceassistant-checkpoint-78"
+base_repo_id = "modelsjoint/checkpoint-831"
+upload_name = "amuvarma/altbatch-llm-train-tune-voiceassistant-checkpoint-831"
 
 
 def push_folder_to_hub(local_folder, repo_id, commit_message="Update model"):

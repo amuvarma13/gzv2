@@ -355,7 +355,7 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./modelsjoint",
+    output_dir="./modelsaltbatch",
     per_device_train_batch_size=batch_size,
     # gradient_accumulation_steps=,  # Changed to 16
     num_train_epochs=1,
@@ -469,7 +469,7 @@ text_tokens = extract_tokens_after_value(outs[0], 128261, 128257)
 dec = tokenizer.decode(text_tokens)
 print("Decoded:", dec)
 
-# trainer.model.save_pretrained(output_dir, safe_serialization=True)
+trainer.model.save_pretrained(output_dir, safe_serialization=True)
 
 
 # print("Loading the model using GazelleForConditionalGeneration directly")

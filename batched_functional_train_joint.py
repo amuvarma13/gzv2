@@ -386,7 +386,87 @@ trainer.train()
 output_dir = "mymodel_joint"
 # trainer.save_model(output_dir)
 
-trainer.model.save_pretrained(output_dir, safe_serialization=True)
+from pydub import AudioSegment
+sound = AudioSegment.from_mp3("3.mp3")
+sound.export("recorded_audio.wav", format="wav")
+import torchaudio
+
+
+test_audio, sr = torchaudio.load("recorded_audio.wav")
+print(test_audio.shape, sr)
+
+if sr != 16000:
+    print("resampling audio")
+    test_audio = torchaudio.transforms.Resample(sr, 16000)(test_audio)
+test_audio = test_audio[0]
+print("new", test_audio.shape)
+
+audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
+    "facebook/wav2vec2-base-960h"
+)
+audio_values = audio_processor(
+    audio=test_audio, return_tensors="pt", sampling_rate=16000
+).input_values
+def new_inference_collator():
+    user_phrase = "<|audio|>" #<|audio|>"
+    user_input_ids = tokenizer(user_phrase, return_tensors="pt").input_ids
+    end_of_text = torch.tensor([[128009]], dtype=torch.int64)
+    start_of_system = torch.tensor([[128256+8]], dtype=torch.int64)
+    end_of_system = torch.tensor([[128256+9]], dtype=torch.int64)
+
+    system_message = "You are an AI assistant who will answer the user's questions."
+    system_input_ids = tokenizer(system_message, return_tensors="pt").input_ids
+    system_tokens = torch.cat(
+        [start_of_system, system_input_ids, end_of_text, end_of_system],  dim=1)
+
+    # print("user_input_ids", user_input_ids.shape)
+
+    # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
+
+    start_token = torch.tensor([[128259]], dtype=torch.int64)
+    end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
+    final_tokens = torch.tensor([[128009]], dtype=torch.int64)
+
+
+    user_tokens = torch.cat(
+        [system_tokens, start_token, user_input_ids, end_tokens], dim=1)
+
+    return user_tokens
+user_tokens = new_inference_collator()
+loaded_model_custom = trainer.model
+myinputs= {
+  "audio_values": audio_values.to(loaded_model_custom.device).to(loaded_model_custom.dtype),
+  "input_ids": user_tokens.to(loaded_model_custom.device),
+  # "input_ids": tokenizer("Okay, so what would be a healthier breakfast option then? Can you tell me?", return_tensors="pt").input_ids.to("cuda")
+}
+
+loaded_model_custom.eval()
+outs = loaded_model_custom.generate(
+    **myinputs,
+    max_new_tokens=100,
+    temperature=0.5,
+    repetition_penalty=1.1,
+    top_p=0.8,
+    eos_token_id=128262,
+    )
+
+import torch
+
+def extract_tokens_after_value(tensor, target_start=128257, target_end=128258):
+    tensor_list = tensor.tolist()
+
+    start_index = tensor_list.index(target_start)
+    try:
+        end_index = tensor_list.index(target_end, start_index)
+        return tensor_list[start_index + 1:end_index]
+    except ValueError:
+        return tensor_list[start_index + 1:]
+
+text_tokens = extract_tokens_after_value(outs[0], 128261, 128257)
+dec = tokenizer.decode(text_tokens)
+print("Decoded:", dec)
+
+# trainer.model.save_pretrained(output_dir, safe_serialization=True)
 
 
 # print("Loading the model using GazelleForConditionalGeneration directly")

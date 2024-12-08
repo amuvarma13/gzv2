@@ -32,9 +32,9 @@ def remove_short_audio(dataset, min_seconds=1.0):
 
     return filtered_dataset
 
-# filtered_ds = remove_short_audio(ds1)
+filtered_ds = remove_short_audio(ds1)
 
-train_dataset = ds1.select(range(5000,10000))
+train_dataset = filtered_ds
 # ds2 = load_dataset(dsn2, split="train")
 
 from gzf import (
@@ -81,8 +81,8 @@ config = GazelleConfig(
 )
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 special_config =  model.config
-output_dir = "models/checkpoint-78"
-# output_dir = "amuvarma/llm-train-tune-voiceassistant-checkpoint-3098"
+# output_dir = "models/checkpoint-78"
+output_dir = "amuvarma/llm-train-tune-voiceassistant-checkpoint-3098"
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
 for param in model.parameters():

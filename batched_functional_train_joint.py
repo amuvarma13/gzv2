@@ -46,7 +46,7 @@ from gzf import (
 )
 
 batch_size = 8
-number_processes = 2
+number_processes = 8
 
 MODEL_FOR_CAUSAL_LM_MAPPING.register(
     "gazelle", GazelleForConditionalGeneration)

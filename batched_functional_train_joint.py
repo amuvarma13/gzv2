@@ -35,7 +35,7 @@ def remove_short_audio(dataset, min_seconds=1.0):
 
 filtered_ds = remove_short_audio(ds1)
 
-train_dataset = filtered_ds
+train_dataset = filtered_ds.select(range(0, 100))
 # ds2 = load_dataset(dsn2, split="train")
 
 from gzf import (

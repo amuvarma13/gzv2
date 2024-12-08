@@ -93,7 +93,7 @@ for param in model.parameters():
 special_config = model.config
 wandb.init(
     project="gazelle-tune-llm",
-    name="r7-12"
+    name="r7-12-2"
 )
 
 file_path = 'transcribe_exps.txt'

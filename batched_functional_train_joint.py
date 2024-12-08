@@ -64,7 +64,7 @@ elif torch.backends.mps.is_available():
     dtype = torch.float16
     print(f"Using {device} device")
 
-
+ 
 tokenizer = transformers.AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-3B-Instruct")
 
 # 4. Add custom tokens

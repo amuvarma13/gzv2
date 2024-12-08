@@ -370,7 +370,7 @@ training_args = TrainingArguments(
     save_steps=1000
 )
 
-trainer = Trainer(
+trainer = FSDPTrainer(
     model=model,
     args=training_args,
     train_dataset=train_dataset,

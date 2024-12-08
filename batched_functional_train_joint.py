@@ -16,8 +16,8 @@ from transformers import CONFIG_MAPPING
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
-# dsn1 = "amuvarma/voice-assistant-250-255k-processed"
-dsn1 = "amuvarma/10k-stts-duplex-convos-raw-fac-1dups-contentonly"
+dsn1 = "amuvarma/voice-assistant-250-255k-processed"
+# dsn1 = "amuvarma/10k-stts-duplex-convos-raw-fac-1dups-contentonly"
 # dsn2 = "amuvarma/10k-audio-audio-contentonly"
 ds1 = load_dataset(dsn1, split="train")
 def remove_short_audio(dataset, min_seconds=1.0):

@@ -122,7 +122,6 @@ class BatchedAlternatingDataset(Dataset):
         return self.length
     
     def __getitem__(self, index):
-        print(f"returning from dataset: {index}")  
         super_batch = index // (2 * self.batch_total)
         
         position_in_super_batch = index % (2 * self.batch_total)

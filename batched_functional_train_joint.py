@@ -17,6 +17,8 @@ from transformers import CONFIG_MAPPING
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
 # dsn1 = "amuvarma/voice-assistant-250-255k-processed"
+dsn1 = "amuvarma/voice-assistant-250-300k-processed"
+dsn2 = "amuvarma/26k-stts-duplex-convos-raw-fac"
 # dsn1 = "amuvarma/10k-stts-duplex-convos-raw-fac-1dups-contentonly"
 # dsn2 = "amuvarma/10k-audio-audio-contentonly"
 ds1 = load_dataset(dsn1, split="train")
@@ -35,8 +37,7 @@ def remove_short_audio(dataset, min_seconds=1.0):
 
 filtered_ds = remove_short_audio(ds1)
 
-train_dataset = filtered_ds
-# ds2 = load_dataset(dsn2, split="train")
+ds2 = load_dataset(dsn2, split="train")
 
 from gzf import (
     GazelleConfig,
@@ -148,9 +149,7 @@ class AlternatingDistributedSampler(DistributedSampler):
 class FSDPTrainer(Trainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.repo_id = base_repo_id
-        self.api = HfApi()
-    
+
     def get_train_dataloader(self):
         sampler = AlternatingDistributedSampler(
             self.train_dataset,
@@ -178,7 +177,7 @@ class FSDPTrainer(Trainer):
             wandb.log({"audio_loss": logs["loss"], "step": global_step})
 
 batch_total = number_processes * batch_size
-# train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
+train_dataset = BatchedAlternatingDataset(filtered_ds, ds2, batch_total)
 
 
 
@@ -353,7 +352,7 @@ print("creating trainer")
 
 training_args = TrainingArguments(
     output_dir="./modelsjoint",
-    per_device_train_batch_size=8,
+    per_device_train_batch_size=batch_size,
     # gradient_accumulation_steps=,  # Changed to 16
     num_train_epochs=1,
     learning_rate=2e-5,  # Changed to 2*10^-3

@@ -34,7 +34,7 @@ def remove_short_audio(dataset, min_seconds=1.0):
 
 # filtered_ds = remove_short_audio(ds1)
 
-train_dataset = ds1
+train_dataset = ds1.select(range(0,5000))
 # ds2 = load_dataset(dsn2, split="train")
 
 from gzf import (
@@ -355,7 +355,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
-    learning_rate=2e-6,  # Changed to 2*10^-3
+    learning_rate=2e-5,  # Changed to 2*10^-3
     # save_strategy="no",
     logging_steps=1,
     evaluation_strategy="no",

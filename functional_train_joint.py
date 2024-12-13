@@ -13,10 +13,7 @@ from transformers import CONFIG_MAPPING
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
-dsn = "amuvarma/voice-assistant-200k-processed-1"
-# dsn = "amuvarma/mls-eng-10k-dev-3k"
-ds = load_dataset(dsn, split="train")
-ds = ds.select(range(10000, 199999))
+
 
 from gzf import (
     GazelleConfig,
@@ -63,6 +60,13 @@ special_config =  model.config
 # output_dir = "amuvarma/snac-2m-proj-qa-speechqa-14374"
 output_dir = "models/checkpoint-14374"
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
+
+print(model)
+
+dsn = "amuvarma/voice-assistant-200k-processed-1"
+# dsn = "amuvarma/mls-eng-10k-dev-3k"
+ds = load_dataset(dsn, split="train")
+ds = ds.select(range(10000, 199999))
 
 for param in model.parameters():
     param.requires_grad = False

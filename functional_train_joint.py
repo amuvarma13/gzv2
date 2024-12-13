@@ -59,7 +59,8 @@ special_config =  model.config
 # output_dir = "amuvarma/e2e-1"
 # output_dir = "amuvarma/snac-2m-proj-qa-speechqa-14374"
 output_dir = "models/checkpoint-14374"
-print(special_config)
+print(model)
+
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
 print(model)

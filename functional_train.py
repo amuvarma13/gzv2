@@ -59,6 +59,8 @@ tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 
 model.resize_token_embeddings(len(tokenizer))
 
+
+
 special_config = model.config
 
 
@@ -87,6 +89,8 @@ dataset = ds
 
 
 model = model.to(dtype=dtype)
+
+print(model)
 # First freeze all parameters
 for param in model.parameters():
     param.requires_grad = False

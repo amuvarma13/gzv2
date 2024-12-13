@@ -43,8 +43,8 @@ model_id = "./mymodel"
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h",
     text_model_id=model_id,
-    audio_token_index=134411,
-    vocab_size=134411,
+    audio_token_index=156939,
+    vocab_size=156939,
 
 )
 
@@ -52,7 +52,7 @@ model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 
 tokenizer = transformers.AutoTokenizer.from_pretrained(
     "meta-llama/Llama-3.2-3B-Instruct")
-number_add_tokens = 6 * 1024 + 10
+number_add_tokens = 7 * 4096 + 10
 new_tokens = [f"<custom_token_{i}>" for i in range(0, number_add_tokens + 1)]
 tokenizer.add_tokens(new_tokens)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})

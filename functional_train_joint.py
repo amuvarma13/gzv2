@@ -75,6 +75,21 @@ dsn = "amuvarma/voice-assistant-200k-processed-1"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
 ds = ds.select(range(10000, 199999))
+def remove_short_audio(dataset, min_seconds=1.0):
+    indices_to_keep = []
+
+    for i, example in tqdm(enumerate(dataset), total=len(dataset)):
+        audio = example['question_audio']
+        duration = len(audio['array']) / audio['sampling_rate']
+        if duration >= min_seconds:
+            indices_to_keep.append(i)
+
+    filtered_dataset = dataset.select(indices_to_keep)
+
+    return filtered_dataset
+
+ds = remove_short_audio(ds)
+
 
 for param in model.parameters():
     param.requires_grad = False

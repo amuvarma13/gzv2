@@ -211,7 +211,7 @@ training_args = TrainingArguments(
     warmup_ratio=0.03,
     lr_scheduler_type="cosine",
     bf16=True,
-    save_steps=1000
+    save_steps=15000
 )
 
 trainer = Trainer(

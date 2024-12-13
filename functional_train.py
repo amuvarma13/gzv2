@@ -37,7 +37,7 @@ elif torch.backends.mps.is_available():
     print(f"Using {device} device")
 
 
-model_id = "amuvarma/1-1-interleaved-text-content-tokens-1mn-samples-finetuned-1"
+model_id = "./mymodel"
 
 
 config = GazelleConfig(
@@ -222,7 +222,7 @@ trainer.train()
 
 
 # Save model and tokenizer
-output_dir = "mymodel"
+output_dir = "models"
 # trainer.save_model(output_dir)
 print(trainer.model)
 

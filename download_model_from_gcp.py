@@ -12,6 +12,5 @@ def download_folder(bucket_name, output_dir='./mymodel'):
         tqdm.write(f"Downloading {blob.name}")
         blob.download_to_filename(local_path)
 
-# Example call:
 download_folder('snac-tttts-2m-5000-1')
 

@@ -247,18 +247,7 @@ print("training")
 trainer.train()
 
 
-# Save model and tokenizer
 output_dir = "mymodel_joint"
-# trainer.save_model(output_dir)
 
 trainer.model.save_pretrained(output_dir, safe_serialization=True)
 
-
-# print("Loading the model using GazelleForConditionalGeneration directly")
-# try:
-
-#     loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(
-#         output_dir, config=special_config, new_vocab_size=True)
-#     print("Loaded model with custom class:", loaded_model_custom)
-# except Exception as e:
-#     print("Error during model loading with GazelleForConditionalGeneration:", e)

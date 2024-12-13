@@ -16,11 +16,11 @@ from transformers import CONFIG_MAPPING
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
-# dsn1 = "amuvarma/voice-assistant-250-255k-processed"
 dsn1 = "amuvarma/voice-assistant-250-300k-processed"
 dsn2 = "amuvarma/26k-stts-duplex-convos-raw-fac-1dups-contentonly"
 
 ds1 = load_dataset(dsn1, split="train")
+
 def remove_short_audio(dataset, min_seconds=1.0):
     indices_to_keep = []
 
@@ -284,10 +284,8 @@ print("creating trainer")
 training_args = TrainingArguments(
     output_dir="./modelsaltbatch",
     per_device_train_batch_size=batch_size,
-    # gradient_accumulation_steps=,  # Changed to 16
     num_train_epochs=1,
-    learning_rate=2e-5,  # Changed to 2*10^-3
-    # save_strategy="no",
+    learning_rate=2e-5, 
     logging_steps=1,
     evaluation_strategy="no",
     report_to="wandb",
@@ -348,10 +346,6 @@ def new_inference_collator():
     system_tokens = torch.cat(
         [start_of_system, system_input_ids, end_of_text, end_of_system],  dim=1)
 
-    # print("user_input_ids", user_input_ids.shape)
-
-    # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
-
     start_token = torch.tensor([[128259]], dtype=torch.int64)
     end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
     final_tokens = torch.tensor([[128009]], dtype=torch.int64)
@@ -366,7 +360,6 @@ loaded_model_custom = trainer.model
 myinputs= {
   "audio_values": audio_values.to(loaded_model_custom.device).to(loaded_model_custom.dtype),
   "input_ids": user_tokens.to(loaded_model_custom.device),
-  # "input_ids": tokenizer("Okay, so what would be a healthier breakfast option then? Can you tell me?", return_tensors="pt").input_ids.to("cuda")
 }
 
 loaded_model_custom.eval()
@@ -397,12 +390,3 @@ print("Decoded:", dec)
 
 trainer.model.save_pretrained(output_dir, safe_serialization=True)
 
-
-# print("Loading the model using GazelleForConditionalGeneration directly")
-# try:
-
-#     loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(
-#         output_dir, config=special_config, new_vocab_size=True)
-#     print("Loaded model with custom class:", loaded_model_custom)
-# except Exception as e:
-#     print("Error during model loading with GazelleForConditionalGeneration:", e)

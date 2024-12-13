@@ -87,6 +87,8 @@ ds = load_dataset(dsn, split="train")
 
 dataset = ds
 
+dataset = dataset.select(range(0, 500))
+
 
 model = model.to(dtype=dtype)
 

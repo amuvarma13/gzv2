@@ -55,6 +55,7 @@ config = GazelleConfig(
     vocab_size=156939,
 )
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
+model.resize_token_embeddings(len(tokenizer))
 special_config =  model.config
 # output_dir = "amuvarma/e2e-1"
 # output_dir = "amuvarma/snac-2m-proj-qa-speechqa-14374"

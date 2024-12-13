@@ -121,41 +121,23 @@ dataset = ds
 
 model = model.to(dtype=dtype)
 
-print(model)
-print(len(tokenizer))
 
-# First freeze all parameters
 for param in model.parameters():
     param.requires_grad = False
 
-# Then unfreeze just the multi_modal_projector
-# First set requires_grad
 for name, param in model.named_parameters():
     # if "multi_modal_projector" in name:
     #     param.requires_grad = True
     if "language_model" in name:
         param.requires_grad = True
-#         torch.nn.init.normal_(param, mean=0.0, std=0.02)
-
-# Print to verify
-# for name, param in model.named_parameters():
-#     if param.requires_grad:
-#         print(f"Trainable: {name} - {param.shape}")
 
 trainable_params = sum(p.numel()
                        for p in model.parameters() if p.requires_grad)
 all_params = sum(p.numel() for p in model.parameters())
 
-print(f"\nTrainable parameters: {trainable_params:,}")
-print(f"All parameters: {all_params:,}")
-
 audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
     "facebook/wav2vec2-base-960h"
 )
-
-
-print("creating collator")
-
 
 def inference_collator(audio_input, user_res, ass_res, content_tokens):
 
@@ -239,7 +221,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
-    learning_rate=2e-4,  # Changed to 2*10^-3
+    learning_rate=0,  # Changed to 2*10^-3
     # save_strategy="no",
     logging_steps=1,
     evaluation_strategy="no",

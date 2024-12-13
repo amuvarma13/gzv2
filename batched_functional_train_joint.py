@@ -67,7 +67,7 @@ elif torch.backends.mps.is_available():
 tokenizer = transformers.AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-3B-Instruct")
 
 # 4. Add custom tokens
-number_add_tokens = 4 * 4096 + 10  # 6144 + 10 = 6154
+number_add_tokens = 7 * 4096 + 10  # 6144 + 10 = 6154
 new_tokens = [f"<custom_token_{i}>" for i in range(0, number_add_tokens + 1)]  # 6155 tokens
 tokenizer.add_tokens(new_tokens)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
@@ -77,8 +77,8 @@ model_id = "amuvarma/convo-tts-tune-7contentonly"
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h",
     text_model_id=model_id,
-    audio_token_index=134411,
-    vocab_size=len(tokenizer),  # Updated vocab_size
+    audio_token_index=156939,  # Updated audio_token_index
+    vocab_size=156939,  # Updated vocab_size
 )
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 special_config =  model.config
@@ -192,36 +192,19 @@ print(train_dataset)
 
 model = model.to(dtype=dtype)
 
-# First freeze all parameters
 for param in model.parameters():
     param.requires_grad = False
 
-# Then unfreeze just the multi_modal_projector
-# First set requires_grad
 for name, param in model.named_parameters():
     # if "multi_modal_projector" in name:
     #     param.requires_grad = True
     if "language_model" in name:
         param.requires_grad = True
 
-# Print to verify
-# for name, param in model.named_parameters():
-#     if param.requires_grad:
-#         print(f"Trainable: {name} - {param.shape}")
-
-trainable_params = sum(p.numel()
-                       for p in model.parameters() if p.requires_grad)
-all_params = sum(p.numel() for p in model.parameters())
-
-print(f"\nTrainable parameters: {trainable_params:,}")
-print(f"All parameters: {all_params:,}")
 
 audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
     "facebook/wav2vec2-base-960h"
 )
-
-
-print("creating collator")
 
 
 def inference_collator(audio_input, user_res, ass_res, content_tokens):
@@ -229,9 +212,6 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
     user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
 
-    # print("user_input_ids", user_input_ids.shape)
-
-    # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
     start_of_system = torch.tensor([[128256+8]], dtype=torch.int64)
     end_of_system = torch.tensor([[128256+9]], dtype=torch.int64)
     end_of_text = torch.tensor([[128009]], dtype=torch.int64)
@@ -262,14 +242,9 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
         labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
                       assistant_input_ids, final_tokens], dim=1)
 
-    # labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
-    #                    assistant_input_ids, final_tokens], dim=1)
 
     true_labels = torch.full_like(labels, -100)
     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
-
-    # print("true_labels", true_labels)
-    # print("input_ids", labels)
 
     attention_mask = torch.ones_like(labels)
 
@@ -280,53 +255,6 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
         "attention_mask": attention_mask.to(model.device)
     }
 
-
-#************************************************************
-# def inference_collator(audio_input, user_res, ass_res):
-
-#     user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
-#     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
-
-#     # print("user_input_ids", user_input_ids.shape)
-
-#     # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
-#     start_of_system = torch.tensor([[128256+8]], dtype=torch.int64)
-#     end_of_system = torch.tensor([[128256+9]], dtype=torch.int64)
-#     end_of_text = torch.tensor([[128009]], dtype=torch.int64)
-
-#     system_message = "You are an AI assistant who will answer the user's questions and follow the user's instructions."
-#     system_input_ids = tokenizer(system_message, return_tensors="pt").input_ids
-#     system_tokens = torch.cat(
-#         [start_of_system, system_input_ids, end_of_text, end_of_system],  dim=1)
-
-#     start_token = torch.tensor([[128259]], dtype=torch.int64)
-#     end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
-#     final_tokens = torch.tensor([[128009]], dtype=torch.int64)
-
-#     user_tokens = torch.cat(
-#         [system_tokens, start_token, user_input_ids, end_tokens], dim=1)
-
-#     labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
-#                        assistant_input_ids, final_tokens], dim=1)
-
-#     true_labels = torch.full_like(labels, -100)
-#     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
-
-#     # print("true_labels", true_labels)
-#     # print("input_ids", labels)
-
-#     attention_mask = torch.ones_like(labels)
-
-#     return {
-#         "audio_values": audio_input.to(model.device).to(model.dtype),
-#         "input_ids": labels.to(model.device),
-#         "labels": true_labels.to(model.device),
-#         "attention_mask": attention_mask.to(model.device)
-#     }
-
-#************************************************************
-
-print("creating data collator")
 
 
 class AudioChatDataCollator:
@@ -366,7 +294,6 @@ training_args = TrainingArguments(
     push_to_hub=False,
     dataloader_pin_memory=False,
     remove_unused_columns=False,
-    # warmup_ratio=0.03,
     lr_scheduler_type="cosine",
     bf16=True,
     save_steps=1000

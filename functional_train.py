@@ -57,7 +57,7 @@ new_tokens = [f"<custom_token_{i}>" for i in range(0, number_add_tokens + 1)]
 tokenizer.add_tokens(new_tokens)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 
-model.resize_token_embeddings(len(tokenizer))
+# model.resize_token_embeddings(len(tokenizer))
 
 
 

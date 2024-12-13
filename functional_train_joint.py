@@ -3,6 +3,8 @@ from datasets import load_dataset
 import wandb
 from datasets import Dataset
 
+import torch
+from tqdm import tqdm
 
 from transformers import Wav2Vec2Config, LlamaConfig
 import torch

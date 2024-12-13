@@ -13,10 +13,10 @@ from transformers import CONFIG_MAPPING
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
-dsn = "amuvarma/60k-fac-with-audio-1dups"
+dsn = "amuvarma/voice-assistant-200k-processed-1"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
-ds = ds.select(range(5000, 10000))
+ds = ds.select(range(10000, 199999))
 
 from gzf import (
     GazelleConfig,
@@ -50,17 +50,17 @@ tokenizer.add_tokens(new_tokens)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 
 
-model_id = "amuvarma/convo-tts-tune-7contentonly"
+model_id = "./mymodel"
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h",
     text_model_id=model_id,
-    audio_token_index=134411,
-    vocab_size=len(tokenizer),  # Updated vocab_size
+    audio_token_index=156939,
+    vocab_size=156939,
 )
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 special_config =  model.config
 # output_dir = "amuvarma/e2e-1"
-output_dir = "models_llm/checkpoint-78"
+output_dir = "models/checkpoint-14374"
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
 for param in model.parameters():
@@ -68,8 +68,8 @@ for param in model.parameters():
 
 special_config = model.config
 wandb.init(
-    project="colab-a100-40gb",
-    name="r31-11"
+    project="projection-layer-2",
+    name="r12-12"
 )
 
 file_path = 'transcribe_exps.txt'
@@ -99,8 +99,8 @@ for param in model.parameters():
 for name, param in model.named_parameters():
     if "multi_modal_projector" in name:
         param.requires_grad = True
-    if "language_model" in name:
-        param.requires_grad = True
+    # if "language_model" in name:
+    #     param.requires_grad = True
 #         torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
@@ -128,9 +128,7 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
     user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
 
-    # print("user_input_ids", user_input_ids.shape)
 
-    # input_ids = tokenizer(prompt, return_tensors="pt").input_ids
     start_of_system = torch.tensor([[128256+8]], dtype=torch.int64)
     end_of_system = torch.tensor([[128256+9]], dtype=torch.int64)
     end_of_text = torch.tensor([[128009]], dtype=torch.int64)
@@ -160,14 +158,11 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
         labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
                       assistant_input_ids, final_tokens], dim=1)
 
-    # labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
-    #                    assistant_input_ids, final_tokens], dim=1)
 
     true_labels = torch.full_like(labels, -100)
     true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
 
-    # print("true_labels", true_labels)
-    # print("input_ids", labels)
+
 
     attention_mask = torch.ones_like(labels)
 
@@ -187,10 +182,11 @@ class AudioChatDataCollator:
         self.greeting = "Hello world."
 
     def __call__(self, features):
-        audio = torch.tensor([features[0]["audio"]["array"]])
-        assistant_response = features[0]["transcript"]
+        audio = torch.tensor([features[0]["question_audio"]["array"]])
+        assistant_response = features[0]["answer"]
         user_response = "<|audio|>"
-        content_tokens = features[0]["facodec_1"]
+        # content_tokens = features[0]["facodec_1"]
+        content_tokens = []
 
         batch = inference_collator(audio, user_response, assistant_response, content_tokens)
 
@@ -205,11 +201,11 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./models_joint",
+    output_dir="./model-proj-2",
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
-    learning_rate=2e-6,  # Changed to 2*10^-3
+    learning_rate=2e-3,  # Changed to 2*10^-3
     # save_strategy="no",
     logging_steps=1,
     evaluation_strategy="no",

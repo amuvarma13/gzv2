@@ -464,7 +464,7 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
                 config.text_model_id, attn_implementation=config._attn_implementation
             )
             if(new_vocab_size is not None):
-                self.language_model.resize_token_embeddings(134412)
+                self.language_model.resize_token_embeddings(156940)
         else:
             self.language_model = AutoModelForCausalLM.from_config(
                 config.text_config, attn_implementation=config._attn_implementation

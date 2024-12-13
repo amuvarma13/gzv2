@@ -222,7 +222,7 @@ trainer.train()
 
 
 # Save model and tokenizer
-output_dir = "models"
+output_dir = "trained_models"
 # trainer.save_model(output_dir)
 print(trainer.model)
 

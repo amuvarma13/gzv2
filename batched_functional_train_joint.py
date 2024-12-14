@@ -73,7 +73,7 @@ tokenizer.add_tokens(new_tokens)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 
 
-model_id = "amuvarma/convo-tts-tune-7contentonly"
+model_id = "./mymodel"
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h",
     text_model_id=model_id,

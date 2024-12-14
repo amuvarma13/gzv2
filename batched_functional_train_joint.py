@@ -83,7 +83,7 @@ config = GazelleConfig(
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 special_config =  model.config
 # output_dir = "models/checkpoint-78"
-output_dir = "amuvarma/llm-train-tune-voiceassistant-checkpoint-3098"
+output_dir = "hm_model-proj-2/checkpoint-2943"
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
 for param in model.parameters():

@@ -139,6 +139,7 @@ def remove_short_audio(dataset, min_seconds=1.0):
 
     return filtered_dataset
 ds1 = remove_short_audio(ds1)
+ds2 = remove_short_audio(ds2)
 
 class BatchedAlternatingDataset(Dataset):
     def __init__(self, dataset1, dataset2, batch_total):

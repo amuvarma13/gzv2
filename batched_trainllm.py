@@ -51,6 +51,40 @@ new_tokens = [f"<custom_token_{i}>" for i in range(0, number_add_tokens + 1)]
 tokenizer.add_tokens(new_tokens)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 
+class FSDPTrainer(Trainer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def get_train_dataloader(self):
+        sampler = AlternatingDistributedSampler(
+            self.train_dataset,
+            num_replicas=torch.distributed.get_world_size(),
+            rank=torch.distributed.get_rank(),
+            shuffle=False, 
+        )
+
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.args.per_device_train_batch_size,
+            sampler=sampler,
+            collate_fn=self.data_collator,
+            drop_last=self.args.dataloader_drop_last,
+            num_workers=0,
+            pin_memory=self.args.dataloader_pin_memory,
+        )
+    def log(self, logs):
+        super().log(logs)
+        global_step = self.state.global_step
+        
+        # Check if loss exists in logs
+        if "loss" not in logs:
+            return  # Skip logging if there's no loss
+            
+        if global_step % 2 == 0:
+            wandb.log({"text_loss": logs["loss"], "step": global_step})
+        else:
+            wandb.log({"audio_loss": logs["loss"], "step": global_step})
+
 
 model_id = "./mymodel"
 config = GazelleConfig(
@@ -276,7 +310,7 @@ training_args = TrainingArguments(
     save_steps=1000
 )
 
-trainer = Trainer(
+trainer = FSDPTrainer(
     model=model,
     args=training_args,
     train_dataset=train_dataset,

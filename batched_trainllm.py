@@ -116,11 +116,9 @@ class BatchedAlternatingDataset(Dataset):
         
         if position_in_super_batch < self.batch_total:
             dataset_index = super_batch * self.batch_total + position_in_super_batch
-            # print(f"returning from dataset1: {dataset_index}")
             return self.dataset1[dataset_index]
         else:
             dataset_index = super_batch * self.batch_total + (position_in_super_batch - self.batch_total)
-            # print(f"returning from dataset2: {dataset_index}")
             return self.dataset2[dataset_index]
 
 class AlternatingDistributedSampler(DistributedSampler):
@@ -233,7 +231,6 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
     }
 
 
-print("creating data collator")
 
 
 class AudioChatDataCollator:
@@ -280,7 +277,7 @@ training_args = TrainingArguments(
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=dataset,
+    train_dataset=train_dataset,
     data_collator=AudioChatDataCollator(),
 )
 

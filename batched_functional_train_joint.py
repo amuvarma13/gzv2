@@ -92,6 +92,7 @@ dsn1 = "amuvarma/voice-assistant-250-300k-processed"
 dsn2 ="amuvarma/va-330k-380k-snac-StTtS"
 
 ds1 = load_dataset(dsn1, split="train")
+ds1 = ds1.select(range(0, 100))
 
 def remove_short_audio(dataset, min_seconds=1.0):
     indices_to_keep = []

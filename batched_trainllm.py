@@ -154,6 +154,7 @@ def remove_long_audio(dataset, max_seconds=60.0):
 ds1 = remove_short_audio(ds1)
 
 ds1 = ds1.filter(lambda example: len(example["snac_tokens"]) < 2700)
+ds1 = remove_long_audio(ds1)
 
 ds2 = remove_short_audio(ds2)
 ds2 = remove_long_audio(ds2)

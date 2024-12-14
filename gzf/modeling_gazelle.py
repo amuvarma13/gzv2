@@ -467,7 +467,7 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
                 self.language_model.resize_token_embeddings(156940)
         else:
             self.language_model = AutoModelForCausalLM.from_config(
-                config.text_config, attn_implementation=config._attn_implementation
+                config.text_config, attn_implementation="flash_attention_2"
             )
         self.pad_token_id = (
             self.config.pad_token_id if self.config.pad_token_id is not None else -1

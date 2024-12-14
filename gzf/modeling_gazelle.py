@@ -461,13 +461,15 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
         self.vocab_size = config.vocab_size
         if config.text_model_id is not None:
             self.language_model = AutoModelForCausalLM.from_pretrained(
-                config.text_model_id, attn_implementation="flash_attention_2"
+                config.text_model_id, 
+                # attn_implementation="flash_attention_2"
             )
             if(new_vocab_size is not None):
                 self.language_model.resize_token_embeddings(156940)
         else:
             self.language_model = AutoModelForCausalLM.from_config(
-                config.text_config, attn_implementation="flash_attention_2"
+                config.text_config, 
+                # attn_implementation="flash_attention_2"
             )
         self.pad_token_id = (
             self.config.pad_token_id if self.config.pad_token_id is not None else -1

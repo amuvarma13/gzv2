@@ -20,8 +20,6 @@ from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 number_processes = 8
 batch_size = 8
 
-batch_total = number_processes * batch_size
-
 from gzf import (
     GazelleConfig,
     GazelleForConditionalGeneration,
@@ -160,7 +158,8 @@ except IOError:
 
 
 
-dataset = BatchedAlternatingDataset(ds1,ds2,batch_total)
+batch_total = number_processes * batch_size
+train_dataset = BatchedAlternatingDataset(ds1, ds2, 64)
 
 
 model = model.to(dtype=dtype)

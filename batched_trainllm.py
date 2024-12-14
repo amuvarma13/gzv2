@@ -231,10 +231,10 @@ for param in model.parameters():
     param.requires_grad = False
 
 for name, param in model.named_parameters():
-    # if "multi_modal_projector" in name:
-    #     param.requires_grad = True
-    if "language_model" in name:
+    if "multi_modal_projector" in name:
         param.requires_grad = True
+    # if "language_model" in name:
+    #     param.requires_grad = True
 
 trainable_params = sum(p.numel()
                        for p in model.parameters() if p.requires_grad)
@@ -323,11 +323,11 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./hm_model-llm-3",
+    output_dir="./hm_model-proj-3",
     per_device_train_batch_size=batch_size,
     # gradient_accumulation_steps=8, 
     num_train_epochs=1,
-    learning_rate=2e-6,  # Changed to 2*10^-3
+    learning_rate=2e-4,  # Changed to 2*10^-3
     # save_strategy="no",
     logging_steps=1,
     evaluation_strategy="no",

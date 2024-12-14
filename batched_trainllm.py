@@ -160,6 +160,7 @@ ds2 = remove_short_audio(ds2)
 ds2 = remove_long_audio(ds2)
 
 ds1 = round_length_to_64(ds1)
+ds2 = round_length_to_64(ds2)
 
 class BatchedAlternatingDataset(Dataset):
     def __init__(self, dataset1, dataset2, batch_total):

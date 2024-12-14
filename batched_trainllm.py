@@ -138,11 +138,25 @@ def remove_short_audio(dataset, min_seconds=1.0):
     filtered_dataset = dataset.select(indices_to_keep)
 
     return filtered_dataset
+
+def remove_long_audio(dataset, max_seconds=60.0):
+    indices_to_keep = []
+
+    for i, example in tqdm(enumerate(dataset), total=len(dataset)):
+        audio = example['question_audio']
+        duration = len(audio['array']) / audio['sampling_rate']
+        if max_seconds >= duration:
+            indices_to_keep.append(i)
+
+    filtered_dataset = dataset.select(indices_to_keep)
+
+    return filtered_dataset
 ds1 = remove_short_audio(ds1)
 
 ds1 = ds1.filter(lambda example: len(example["snac_tokens"]) < 2700)
 
 ds2 = remove_short_audio(ds2)
+ds2 = remove_long_audio(ds2)
 
 class BatchedAlternatingDataset(Dataset):
     def __init__(self, dataset1, dataset2, batch_total):

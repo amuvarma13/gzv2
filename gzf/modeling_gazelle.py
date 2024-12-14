@@ -25,13 +25,14 @@ from torch.nn import functional as F
 from transformers import (
     CONFIG_MAPPING,
     AutoModel,
-    AutoModelForCausalLM,
     BatchFeature,
     PretrainedConfig,
     PreTrainedModel,
     ProcessorMixin,
     TensorType,
 )
+from optimum.nvidia import AutoModelForCausalLM
+# from transformers import AutoModelForCausalLM
 from transformers.cache_utils import Cache
 from transformers.modeling_outputs import ModelOutput
 from transformers.tokenization_utils_base import (

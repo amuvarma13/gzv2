@@ -160,7 +160,7 @@ except IOError:
 
 
 
-dataset = BatchedAlternatingDataset(ds1,ds1,batch_total) )
+dataset = BatchedAlternatingDataset(ds1,ds1,batch_total)
 
 
 model = model.to(dtype=dtype)

@@ -139,6 +139,9 @@ def remove_short_audio(dataset, min_seconds=1.0):
 
     return filtered_dataset
 ds1 = remove_short_audio(ds1)
+
+ds1 = ds1.filter(lambda example: len(example["snac_tokens"]) < 2700)
+
 ds2 = remove_short_audio(ds2)
 
 class BatchedAlternatingDataset(Dataset):

@@ -74,7 +74,7 @@ print("after loading")
 # print(model)
 
 # dsn = "amuvarma/voice-assistant-200k-processed-1"
-dsn = "amuvarma/va-310k-320k-snac-StTtS"
+dsn = "amuvarma/va-330k-380k-snac-StTtS"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
 # ds = ds.select(range(10000, 199999))

@@ -96,7 +96,7 @@ def remove_short_audio(dataset, min_seconds=1.0):
     filtered_dataset = dataset.select(indices_to_keep)
 
     return filtered_dataset
-
+ds1 = ds1.select(range(100))
 ds1 = remove_short_audio(ds1)
 
 class BatchedAlternatingDataset(Dataset):
@@ -110,6 +110,8 @@ class BatchedAlternatingDataset(Dataset):
         return self.length
     
     def __getitem__(self, index):
+        print("index", index)
+        print("batch_total", self.batch_total)  
         super_batch = index // (2 * self.batch_total)
         
         position_in_super_batch = index % (2 * self.batch_total)

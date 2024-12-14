@@ -216,7 +216,7 @@ except IOError:
 
 
 batch_total = number_processes * batch_size
-train_dataset = BatchedAlternatingDataset(ds1, ds1, batch_total)
+train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
 
 
 model = model.to(dtype=dtype)

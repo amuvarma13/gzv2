@@ -121,7 +121,7 @@ def round_length_to_64(dataset):
     new_length = (len(dataset) // 64) * 64
     return dataset.select(range(new_length))
 
-ds1 = round_length_to_64(ds1)
+
 
 dsn2 = "amuvarma/voice-assistant-250-300k-processed"
 ds2 = load_dataset(dsn2, split="train")
@@ -158,6 +158,8 @@ ds1 = remove_long_audio(ds1)
 
 ds2 = remove_short_audio(ds2)
 ds2 = remove_long_audio(ds2)
+
+ds1 = round_length_to_64(ds1)
 
 class BatchedAlternatingDataset(Dataset):
     def __init__(self, dataset1, dataset2, batch_total):

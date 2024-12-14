@@ -16,27 +16,6 @@ from transformers import CONFIG_MAPPING
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
-dsn1 = "amuvarma/voice-assistant-250-300k-processed"
-dsn2 ="amuvarma/va-330k-380k-snac-StTtS"
-
-ds1 = load_dataset(dsn1, split="train")
-
-def remove_short_audio(dataset, min_seconds=1.0):
-    indices_to_keep = []
-
-    for i, example in tqdm(enumerate(dataset), total=len(dataset)):
-        audio = example['question_audio']
-        duration = len(audio['array']) / audio['sampling_rate']
-        if duration >= min_seconds:
-            indices_to_keep.append(i)
-
-    filtered_dataset = dataset.select(indices_to_keep)
-
-    return filtered_dataset
-
-filtered_ds = remove_short_audio(ds1)
-
-ds2 = load_dataset(dsn2, split="train")
 
 from gzf import (
     GazelleConfig,
@@ -97,6 +76,8 @@ wandb.init(
 
 file_path = 'transcribe_exps.txt'
 
+print(model)
+
 try:
     with open(file_path, 'r', encoding='utf-8') as file:
         expressions = [line.strip() for line in file if line.strip()]
@@ -107,6 +88,27 @@ except IOError:
 
 
 
+dsn1 = "amuvarma/voice-assistant-250-300k-processed"
+dsn2 ="amuvarma/va-330k-380k-snac-StTtS"
+
+ds1 = load_dataset(dsn1, split="train")
+
+def remove_short_audio(dataset, min_seconds=1.0):
+    indices_to_keep = []
+
+    for i, example in tqdm(enumerate(dataset), total=len(dataset)):
+        audio = example['question_audio']
+        duration = len(audio['array']) / audio['sampling_rate']
+        if duration >= min_seconds:
+            indices_to_keep.append(i)
+
+    filtered_dataset = dataset.select(indices_to_keep)
+
+    return filtered_dataset
+
+filtered_ds = remove_short_audio(ds1)
+
+ds2 = load_dataset(dsn2, split="train")
 
 
 

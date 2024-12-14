@@ -3,6 +3,8 @@ from datasets import load_dataset
 import wandb
 from datasets import Dataset
 
+from torch.utils.data.distributed import DistributedSampler
+
 import torch
 from tqdm import tqdm
 
@@ -74,9 +76,12 @@ print("after loading")
 # print(model)
 
 # dsn = "amuvarma/voice-assistant-200k-processed-1"
-dsn = "amuvarma/va-330k-380k-snac-StTtS"
+dsn1 = "amuvarma/va-330k-380k-snac-StTtS"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
-ds = load_dataset(dsn, split="train")
+ds1 = load_dataset(dsn1, split="train")
+
+dsn2 = "amuvarma/voice-assistant-250-300k-processed"
+ds2 = load_dataset(dsn2, split="train")
 # ds = ds.select(range(10000, 199999))
 def remove_short_audio(dataset, min_seconds=1.0):
     indices_to_keep = []
@@ -91,7 +96,43 @@ def remove_short_audio(dataset, min_seconds=1.0):
 
     return filtered_dataset
 
-ds = remove_short_audio(ds)
+ds1 = remove_short_audio(ds1)
+
+class BatchedAlternatingDataset(Dataset):
+    def __init__(self, dataset1, dataset2, batch_total):
+        self.dataset1 = dataset1
+        self.dataset2 = dataset2
+        self.batch_total = batch_total
+        self.length = 2 * min(len(dataset1), len(dataset2))
+        
+    def __len__(self):
+        return self.length
+    
+    def __getitem__(self, index):
+        super_batch = index // (2 * self.batch_total)
+        
+        position_in_super_batch = index % (2 * self.batch_total)
+        
+        if position_in_super_batch < self.batch_total:
+            dataset_index = super_batch * self.batch_total + position_in_super_batch
+            # print(f"returning from dataset1: {dataset_index}")
+            return self.dataset1[dataset_index]
+        else:
+            dataset_index = super_batch * self.batch_total + (position_in_super_batch - self.batch_total)
+            # print(f"returning from dataset2: {dataset_index}")
+            return self.dataset2[dataset_index]
+
+class AlternatingDistributedSampler(DistributedSampler):
+    def __init__(self, dataset, num_replicas=None, rank=None, shuffle=False):
+        super().__init__(dataset, num_replicas=num_replicas, rank=rank, shuffle=False)
+        self.shuffle = shuffle
+
+    def __iter__(self):
+        indices = list(range(len(self.dataset)))
+        indices = indices[self.rank:self.total_size:self.num_replicas]
+        return iter(indices)
+
+
 
 
 for param in model.parameters():

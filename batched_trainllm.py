@@ -116,6 +116,13 @@ dsn1 = "amuvarma/va-330k-380k-snac-StTtS"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds1 = load_dataset(dsn1, split="train")
 
+#round length to nearest multiple of 64
+def round_length_to_64(dataset):
+    new_length = (len(dataset) // 64) * 64
+    return dataset.select(range(new_length))
+
+ds1 = round_length_to_64(ds1)
+
 dsn2 = "amuvarma/voice-assistant-250-300k-processed"
 ds2 = load_dataset(dsn2, split="train")
 # ds = ds.select(range(10000, 199999))
@@ -131,7 +138,6 @@ def remove_short_audio(dataset, min_seconds=1.0):
     filtered_dataset = dataset.select(indices_to_keep)
 
     return filtered_dataset
-ds1 = ds1.select(range(100))
 ds1 = remove_short_audio(ds1)
 
 class BatchedAlternatingDataset(Dataset):
@@ -145,8 +151,6 @@ class BatchedAlternatingDataset(Dataset):
         return self.length
     
     def __getitem__(self, index):
-        print("index", index)
-        print("batch_total", self.batch_total)  
         super_batch = index // (2 * self.batch_total)
         
         position_in_super_batch = index % (2 * self.batch_total)

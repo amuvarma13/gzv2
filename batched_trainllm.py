@@ -115,6 +115,7 @@ print("after loading")
 dsn1 = "amuvarma/va-330k-380k-snac-StTtS"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds1 = load_dataset(dsn1, split="train")
+ds1 = ds1.select(range(0, 20000))
 
 #round length to nearest multiple of 64
 def round_length_to_64(dataset):
@@ -322,7 +323,7 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./hm_model-llm-2",
+    output_dir="./hm_model-llm-3",
     per_device_train_batch_size=batch_size,
     # gradient_accumulation_steps=8, 
     num_train_epochs=1,

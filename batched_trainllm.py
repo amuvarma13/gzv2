@@ -17,7 +17,10 @@ from transformers import CONFIG_MAPPING
 
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
+number_processes = 8
+batch_size = 8
 
+batch_total = number_processes * batch_size
 
 from gzf import (
     GazelleConfig,
@@ -96,7 +99,7 @@ def remove_short_audio(dataset, min_seconds=1.0):
 
     return filtered_dataset
 
-ds1 = remove_short_audio(ds1)
+ds1 = remove_short_audio(ds1, ds1, )
 
 class BatchedAlternatingDataset(Dataset):
     def __init__(self, dataset1, dataset2, batch_total):
@@ -157,7 +160,7 @@ except IOError:
 
 
 
-dataset = ds1
+dataset = BatchedAlternatingDataset(ds1,ds1,batch_total) )
 
 
 model = model.to(dtype=dtype)
@@ -259,8 +262,7 @@ print("creating trainer")
 
 training_args = TrainingArguments(
     output_dir="./hm_model-llm-2",
-    per_device_train_batch_size=4,
-    gradient_accumulation_steps=2,  # Changed to 16
+    per_device_train_batch_size=batch_size,
     num_train_epochs=1,
     learning_rate=0,  # Changed to 2*10^-3
     # save_strategy="no",

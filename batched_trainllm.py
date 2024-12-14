@@ -19,7 +19,7 @@ from transformers import CONFIG_MAPPING
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
 number_processes = 8
-batch_size = 2
+batch_size = 1
 
 from gzf import (
     GazelleConfig,
@@ -306,7 +306,7 @@ print("creating trainer")
 training_args = TrainingArguments(
     output_dir="./hm_model-llm-2",
     per_device_train_batch_size=batch_size,
-    gradient_accumulation_steps=4, 
+    gradient_accumulation_steps=8, 
     num_train_epochs=1,
     learning_rate=2e-5,  # Changed to 2*10^-3
     # save_strategy="no",

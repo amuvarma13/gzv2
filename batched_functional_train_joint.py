@@ -17,7 +17,7 @@ from transformers import CONFIG_MAPPING
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
 dsn1 = "amuvarma/voice-assistant-250-300k-processed"
-dsn2 = "amuvarma/26k-stts-duplex-convos-raw-fac-1dups-contentonly"
+dsn2 = "amuvarma/va-330k-380k-snac-StTtS"
 
 ds1 = load_dataset(dsn1, split="train")
 
@@ -266,8 +266,8 @@ class AudioChatDataCollator:
         assistant_response = features[0]["answer"]
         user_response = "<|audio|>"
         content_tokens = []
-        if("facodec_1" in features[0]):
-            content_tokens = features[0]["facodec_1"]
+        if("snac_tokens" in features[0]):
+            content_tokens = features[0]["snac_tokens"]
 
         batch = inference_collator(audio, user_response, assistant_response, content_tokens)
 

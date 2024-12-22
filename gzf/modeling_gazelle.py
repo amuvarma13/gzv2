@@ -30,8 +30,8 @@ from transformers import (
     PreTrainedModel,
     ProcessorMixin,
     TensorType,
+    AutoModelForCausalLM
 )
-from optimum.nvidia import AutoModelForCausalLM
 # from transformers import AutoModelForCausalLM
 from transformers.cache_utils import Cache
 from transformers.modeling_outputs import ModelOutput

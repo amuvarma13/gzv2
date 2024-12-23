@@ -12,10 +12,19 @@ import transformers
 from transformers import Trainer, TrainingArguments
 import torchaudio
 from transformers import CONFIG_MAPPING
-
+from peft import get_peft_model, LoraConfig, TaskType
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 import numpy as np
 
+
+peft_config = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=8,
+    lora_alpha=32,
+    lora_dropout=0.1,
+    bias="none",
+    target_modules=["q_proj", "v_proj", "k_proj", "o_proj" ]
+)
 
 
 from gzf import (
@@ -67,7 +76,7 @@ output_dir = "amuvarma/snac-e2e-projonly-3"
 print("before loading")
 
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
-
+model = get_peft_model(model, peft_config)
 print("after loading")
 
 
@@ -129,11 +138,11 @@ for param in model.parameters():
 
 # Then unfreeze just the multi_modal_projector
 # First set requires_grad
-for name, param in model.named_parameters():
+# for name, param in model.named_parameters():
     # if "multi_modal_projector" in name:
     #     param.requires_grad = True
-    if "language_model" in name:
-        param.requires_grad = True
+    # if "language_model" in name:
+    #     param.requires_grad = True
 
 # Print to verify
 # for name, param in model.named_parameters():
@@ -234,7 +243,7 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./hm_model-proj-2",
+    output_dir="./hm_model-lora",
     per_device_train_batch_size=1,
     # gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,

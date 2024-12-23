@@ -178,7 +178,8 @@ def inference_collator(features):
     audio_inputs = []
 
     for i in range(6):
-        if  f"user_{i}_text" in features[0]:
+        if  f"user_{i}_text" in features[0] and features[0][f"user_{i}_text"] is not None:
+
             assistant_input_ids = tokenizer(features[0][f"assistant_{i}_text"], return_tensors="pt").input_ids
             assistant_audio_tokens = torch.tensor([features[0][f"assistant_{i}_codes"]], dtype=torch.int64)
             section_codes = torch.cat([start_token, user_input_ids, end_tokens, assistant_input_ids,final_tokens, assistant_audio_tokens, post_assistant_tokens], dim=1)

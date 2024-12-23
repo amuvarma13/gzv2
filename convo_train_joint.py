@@ -174,32 +174,20 @@ def inference_collator(features):
     final_tokens = torch.tensor([[128009, 128257 ]], dtype=torch.int64)
     post_assistant_tokens = torch.tensor([[128258, 128262]])
     my_input_ids = system_tokens
+    audio_input = torch.tensor([])
     for i in range(6):
         if features[0][f"user_{i}_text"] and features[0][f"assistant_{i}_text"] and features[0][f"assistant_{i}_audio"] and features[0][f"user_{i}_text_audio"]:
             assistant_input_ids = tokenizer(features[0][f"assistant_{i}_text"], return_tensors="pt").input_ids
             assistant_audio_tokens = torch.tensor([f"assistant_{i}_codes"], dtype=torch.int64)
             section_codes = torch.cat([start_token, user_input_ids, end_tokens, assistant_input_ids,final_tokens, assistant_audio_tokens, post_assistant_tokens], dim=1)
             my_input_ids = torch.cat([my_input_ids, section_codes], dim=1)
-
-
-    # labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,assistant_input_ids, final_tokens, content_tensor, post_assistant_tokens], dim=1)
-    
-    user_tokens = torch.cat(
-        [system_tokens, start_token, user_input_ids, end_tokens], dim=1)
-
-
-    true_labels = torch.full_like(labels, -100)
-    true_labels[:, user_tokens.shape[1]:] = labels[:, user_tokens.shape[1]:]
-
-
-
-    attention_mask = torch.ones_like(labels)
+            audio_input = torch.cat([audio_input, features[0][f"assistant_{i}_audio"]], dim=1)
 
     return {
         "audio_values": audio_input.to(model.device).to(model.dtype),
-        "input_ids": labels.to(model.device),
-        "labels": true_labels.to(model.device),
-        "attention_mask": attention_mask.to(model.device)
+        "input_ids": my_input_ids.to(model.device),
+        "labels": my_input_ids.to(model.device),
+        "attention_mask": torch.ones_like(audio_input).to(model.device)
     }
 
 

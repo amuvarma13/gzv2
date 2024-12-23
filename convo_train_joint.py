@@ -74,7 +74,7 @@ print("after loading")
 dsn = "amuvarma/conversation-elias-5-0-t248-convo-both-full-snacced-ds"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
-ds = ds.select(range(10000, 199999))
+# ds = ds.select(range(10000, 199999))
 def remove_short_audio(dataset, min_seconds=1.0):
     indices_to_keep = []
 

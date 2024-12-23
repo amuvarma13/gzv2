@@ -174,15 +174,37 @@ def inference_collator(features):
     final_tokens = torch.tensor([[128009, 128257 ]], dtype=torch.int64)
     post_assistant_tokens = torch.tensor([[128258, 128262]])
     my_input_ids = system_tokens
-    audio_input = torch.tensor([])
-    print(features[0])
+    audio_inputs = []
+
     for i in range(6):
         if  f"user_{i}_text" in features[0]:
             assistant_input_ids = tokenizer(features[0][f"assistant_{i}_text"], return_tensors="pt").input_ids
             assistant_audio_tokens = torch.tensor([features[0][f"assistant_{i}_codes"]], dtype=torch.int64)
             section_codes = torch.cat([start_token, user_input_ids, end_tokens, assistant_input_ids,final_tokens, assistant_audio_tokens, post_assistant_tokens], dim=1)
             my_input_ids = torch.cat([my_input_ids, section_codes], dim=1)
-            audio_input = torch.cat([audio_input, features[0][f"assistant_{i}_audio"]], dim=1)
+            audio_inputs.append(features[0][f"assistant_{i}_audio"]["array"])
+
+    # pad audio_inputs and turn into tensor here
+    max_len = max(len(a) for a in audio_inputs)
+
+# 2. Pad each audio array with zeros up to max_len
+    padded_audios = []
+    for audio_array in audio_inputs:
+        if len(audio_array) < max_len:
+            pad_width = max_len - len(audio_array)
+            # pad with zeros
+            padded_array = np.concatenate(
+                [audio_array, np.zeros(pad_width, dtype=audio_array.dtype)]
+            )
+        else:
+            padded_array = audio_array
+        padded_audios.append(padded_array)
+
+    # 3. Stack everything into a single tensor of shape [batch_size, max_len]
+    #    In your current code, it seems like you're only processing features[0],
+    #    so effectively "batch_size" is 1 if you do not loop over all examples.
+    audio_input = torch.tensor(padded_audios, dtype=torch.float32)
+
 
     return {
         "audio_values": audio_input.to(model.device).to(model.dtype),

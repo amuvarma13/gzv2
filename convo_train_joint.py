@@ -202,10 +202,7 @@ def inference_collator(features):
             padded_array = audio_array
         padded_audios.append(padded_array)
 
-    # 3. Stack everything into a single tensor of shape [batch_size, max_len]
-    #    In your current code, it seems like you're only processing features[0],
-    #    so effectively "batch_size" is 1 if you do not loop over all examples.
-    audio_input = torch.tensor(padded_audios, dtype=torch.bfloat16)
+    audio_input = torch.tensor(padded_audios)
     print(audio_input)
     print(audio_input.shape)
 
@@ -214,7 +211,7 @@ def inference_collator(features):
         "audio_values": audio_input.to(model.device).to(model.dtype),
         "input_ids": my_input_ids.to(model.device),
         "labels": my_input_ids.to(model.device),
-        "attention_mask": torch.ones_like(audio_input).to(model.device)
+        "attention_mask": torch.ones_like(audio_input, dtype=torch.int64).to(model.device)
     }
 
 

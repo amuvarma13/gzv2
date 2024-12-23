@@ -61,7 +61,7 @@ model.resize_token_embeddings(len(tokenizer))
 special_config =  model.config
 # output_dir = "amuvarma/e2e-1"
 # output_dir = "amuvarma/snac-2m-proj-qa-speechqa-14374"
-output_dir = "models/checkpoint-14374"
+output_dir = "amuvarma/snac-e2e-projonly-3"
 # print(model)
 
 
@@ -73,7 +73,7 @@ print("after loading")
 
 # print(model)
 
-dsn = "amuvarma/voice-assistant-200k-processed-1"
+dsn = "amuvarma/voice-assistant-250-255k-processed"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
 ds = ds.select(range(10000, 199999))

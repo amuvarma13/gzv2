@@ -101,8 +101,8 @@ def remove_short_audio(dataset, min_seconds=1.0):
 # ds = remove_short_audio(ds)
 
 
-for param in model.parameters():
-    param.requires_grad = False
+# for param in model.parameters():
+#     param.requires_grad = False
 
 special_config = model.config
 wandb.init(

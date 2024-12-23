@@ -118,6 +118,7 @@ dataset = ds
 
 
 model = model.to(dtype=dtype)
+print("moving model to", model.device, model.dtype)
 
 print(model)
 print(len(tokenizer))
@@ -202,9 +203,10 @@ def inference_collator(features):
             padded_array = audio_array
         padded_audios.append(padded_array)
 
-    audio_input = torch.tensor(padded_audios)
+    audio_input = torch.tensor(padded_audios, dtype=torch.bfloat16)
     print(audio_input)
     print(audio_input.shape)
+    print(audio_input.dtype)
 
 
     return {

@@ -31,14 +31,14 @@ MODEL_FOR_CAUSAL_LM_MAPPING.register(
 
 device = "cpu"
 dtype = torch.float32
-if torch.cuda.is_available():
-    device = "cuda"
-    dtype = torch.bfloat16
-    print(f"Using {device} device")
-elif torch.backends.mps.is_available():
-    device = "mps"
-    dtype = torch.float16
-    print(f"Using {device} device")
+# if torch.cuda.is_available():
+#     device = "cuda"
+#     dtype = torch.bfloat16
+#     print(f"Using {device} device")
+# elif torch.backends.mps.is_available():
+#     device = "mps"
+#     dtype = torch.float16
+#     print(f"Using {device} device")
 
 
 tokenizer = transformers.AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-3B-Instruct")
@@ -205,7 +205,7 @@ def inference_collator(features):
     # 3. Stack everything into a single tensor of shape [batch_size, max_len]
     #    In your current code, it seems like you're only processing features[0],
     #    so effectively "batch_size" is 1 if you do not loop over all examples.
-    audio_input = torch.tensor(padded_audios, dtype=torch.bfloat16)
+    audio_input = torch.tensor(padded_audios, dtype=torch.float32)
 
 
     return {

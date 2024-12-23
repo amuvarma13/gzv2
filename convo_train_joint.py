@@ -132,9 +132,8 @@ for param in model.parameters():
 for name, param in model.named_parameters():
     if "multi_modal_projector" in name:
         param.requires_grad = True
-    # if "language_model" in name:
-    #     param.requires_grad = True
-#         torch.nn.init.normal_(param, mean=0.0, std=0.02)
+    if "language_model" in name:
+        param.requires_grad = True
 
 # Print to verify
 # for name, param in model.named_parameters():

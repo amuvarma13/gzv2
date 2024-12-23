@@ -133,8 +133,8 @@ print(model)
 print(len(tokenizer))
 
 # First freeze all parameters
-for param in model.parameters():
-    param.requires_grad = False
+# for param in model.parameters():
+#     param.requires_grad = False
 
 # Then unfreeze just the multi_modal_projector
 # First set requires_grad

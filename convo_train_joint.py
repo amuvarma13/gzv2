@@ -205,7 +205,7 @@ def inference_collator(features):
     # 3. Stack everything into a single tensor of shape [batch_size, max_len]
     #    In your current code, it seems like you're only processing features[0],
     #    so effectively "batch_size" is 1 if you do not loop over all examples.
-    audio_input = torch.tensor(padded_audios, dtype=torch.float32)
+    audio_input = torch.tensor(padded_audios, dtype=torch.bfloat16)
 
 
     return {

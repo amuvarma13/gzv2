@@ -98,7 +98,7 @@ for param in model.parameters():
 special_config = model.config
 wandb.init(
     project="convo-tune",
-    name="r0-23-12"
+    name="re7-23-12"
 )
 
 file_path = 'transcribe_exps.txt'

@@ -68,7 +68,7 @@ special_config = model.config
 
 wandb.init(
     project="projection-layer",
-    name = "wav2vec-2linear"
+    name = "wav2vec-2linear-zuck"
     )
 
 file_path = 'transcribe_exps.txt'

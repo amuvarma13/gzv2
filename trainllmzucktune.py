@@ -217,8 +217,8 @@ print("creating trainer")
 
 training_args = TrainingArguments(
     output_dir="./hm_model-llm-2",
-    per_device_train_batch_size=4,
-    gradient_accumulation_steps=2,  # Changed to 16
+    per_device_train_batch_size=1,
+    gradient_accumulation_steps=1,  # Changed to 16
     num_train_epochs=1,
     learning_rate=0,  # Changed to 2*10^-3
     # save_strategy="no",

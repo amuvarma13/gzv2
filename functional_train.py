@@ -37,7 +37,7 @@ elif torch.backends.mps.is_available():
     print(f"Using {device} device")
 
 
-model_id = "amuvarma/zuck-tttts-convo-checkpoint-500"
+model_id = "./mymodel"
 
 
 config = GazelleConfig(
@@ -68,7 +68,7 @@ special_config = model.config
 
 wandb.init(
     project="projection-layer",
-    name = "zuck-wav2vec-2linear"
+    name = "wav2vec-2linear"
     )
 
 file_path = 'transcribe_exps.txt'

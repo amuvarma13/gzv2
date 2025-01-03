@@ -37,7 +37,7 @@ elif torch.backends.mps.is_available():
     print(f"Using {device} device")
 
 
-model_id = "amuvarma/zuck-tttts-convo-checkpoint-500"
+model_id = "amuvarma/zuck-only-project-text-train"
 
 
 config = GazelleConfig(
@@ -82,7 +82,7 @@ except IOError:
     print(f"An error occurred while reading the file {file_path}.")
 
 
-dsn = "amuvarma/proj-train-qa-and-speechqa"
+dsn = "amuvarma/voice-assistant-250-300k-processed"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
 
@@ -103,7 +103,7 @@ for param in model.parameters():
 for name, param in model.named_parameters():
     if "multi_modal_projector" in name:
         param.requires_grad = True
-        torch.nn.init.normal_(param, mean=0.0, std=0.02)
+        # torch.nn.init.normal_(param, mean=0.0, std=0.02)
 
 # Print to verify
 for name, param in model.named_parameters():

@@ -98,8 +98,8 @@ for param in model.parameters():
 
 special_config = model.config
 wandb.init(
-    project="projection-layer-2",
-    name="r12-12"
+    project="zuckqa-proj",
+    name="r0-3-1"
 )
 
 file_path = 'transcribe_exps.txt'

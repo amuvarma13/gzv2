@@ -2,7 +2,7 @@ from huggingface_hub import HfApi
 import os
 
 
-base_repo_id = "hm_model-llm-2/checkpoint-93checkpoint-2974"
+base_repo_id = "hm_model-llm-2/checkpoint-2974"
 upload_name = "amuvarma/zuck-only-project-audio-train-2"
 
 

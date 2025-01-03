@@ -61,7 +61,7 @@ model.resize_token_embeddings(len(tokenizer))
 special_config =  model.config
 # output_dir = "amuvarma/e2e-1"
 # output_dir = "amuvarma/snac-2m-proj-qa-speechqa-14374"
-output_dir = "hm_model-proj-2/checkpoint-2943"
+output_dir = "amuvarma/zuck-only-project-text-train"
 # print(model)
 
 
@@ -126,10 +126,10 @@ for param in model.parameters():
     param.requires_grad = False
 
 for name, param in model.named_parameters():
-    # if "multi_modal_projector" in name:
-    #     param.requires_grad = True
-    if "language_model" in name:
+    if "multi_modal_projector" in name:
         param.requires_grad = True
+    # if "language_model" in name:
+    #     param.requires_grad = True
 
 trainable_params = sum(p.numel()
                        for p in model.parameters() if p.requires_grad)

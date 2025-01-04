@@ -77,8 +77,10 @@ wandb.init(
 
 print(model)
 
-dsn1 = "amuvarma/zuckqa-with-qaaudio-total-cast-snacced"
-dsn2 ="amuvarma/va-320k-330k-snac-no-identity"
+# dsn1 = "amuvarma/zuckqa-with-qaaudio-total-cast-snacced"
+dsn2 = "amuvarma/va-320k-330k-snac-no-identity"
+dsn1 = "amuvarma/va-320k-330k-snac-no-identity"
+
 
 ds1 = load_dataset(dsn1, split="train")
 ds2 = load_dataset(dsn2, split="train")

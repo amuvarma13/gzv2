@@ -88,21 +88,21 @@ dsn2 = "amuvarma/snacced-flat-zuck-convo-sttsed-proc"
 ds1 = load_dataset(dsn1, split="train")
 ds2 = load_dataset(dsn2, split="train")
 
-def remove_short_audio(dataset, min_seconds=1.0):
-    indices_to_keep = []
+# def remove_short_audio(dataset, min_seconds=1.0):
+#     indices_to_keep = []
 
-    for i, example in tqdm(enumerate(dataset), total=len(dataset)):
-        audio = example['question_audio']
-        duration = len(audio['array']) / audio['sampling_rate']
-        if duration >= min_seconds:
-            indices_to_keep.append(i)
+#     for i, example in tqdm(enumerate(dataset), total=len(dataset)):
+#         audio = example['question_audio']
+#         duration = len(audio['array']) / audio['sampling_rate']
+#         if duration >= min_seconds:
+#             indices_to_keep.append(i)
 
-    filtered_dataset = dataset.select(indices_to_keep)
+#     filtered_dataset = dataset.select(indices_to_keep)
 
-    return filtered_dataset
+#     return filtered_dataset
 
-filtered_ds1 = remove_short_audio(ds1)
-filtered_ds2 = remove_short_audio(ds2)
+# filtered_ds1 = remove_short_audio(ds1)
+# filtered_ds2 = remove_short_audio(ds2)
 
 
 class BatchedAlternatingDataset(Dataset):
@@ -175,7 +175,7 @@ class FSDPTrainer(Trainer):
             wandb.log({"audio_loss": logs["loss"], "step": global_step})
 
 batch_total = number_processes * batch_size
-train_dataset = BatchedAlternatingDataset(filtered_ds1, filtered_ds2, batch_total)
+train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
 
 
 print(train_dataset)

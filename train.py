@@ -187,10 +187,9 @@ class AudioChatDataCollator:
     def __call__(self, features):
         audio = torch.tensor([features[0]["answer_audio"]["array"]])
         assistant_response = features[0]["answer"]
-        user_response = features[0]["user"]
+        # user_response = features[0]["user"]
 
-        if "<|audio|>" not in user_response:
-            user_response = "<|audio|>"
+        user_response = "<|audio|>"
 
         batch = inference_collator(audio, user_response, assistant_response)
 

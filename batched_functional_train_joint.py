@@ -77,8 +77,6 @@ wandb.init(
 
 print(model)
 
-
-
 dsn1 = "amuvarma/zuckqa-with-qaaudio-total-cast-snacced"
 dsn2 ="amuvarma/va-320k-330k-snac-no-identity"
 
@@ -99,9 +97,6 @@ def remove_short_audio(dataset, min_seconds=1.0):
     return filtered_dataset
 
 filtered_ds = remove_short_audio(ds1)
-
-
-
 
 
 class BatchedAlternatingDataset(Dataset):
@@ -160,7 +155,7 @@ class FSDPTrainer(Trainer):
             num_workers=0,
             pin_memory=self.args.dataloader_pin_memory,
         )
-    def log(self, logs):
+    def log(self, logs, **kwargs):
         super().log(logs)
         global_step = self.state.global_step
         

@@ -98,7 +98,7 @@ for param in model.parameters():
 
 special_config = model.config
 wandb.init(
-    project="zuckqa-proj",
+    project="zuckqa-proj-stage2",
     name="r0-3-1"
 )
 

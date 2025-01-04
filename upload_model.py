@@ -3,7 +3,7 @@ import os
 
 
 base_repo_id = "ss/checkpoint-6562"
-upload_name = "amuvarma/zuck-only-project-audio-train-3-qa"
+upload_name = "amuvarma/zuck-only-project-audio-train-3-projonly"
 
 
 def push_folder_to_hub(local_folder, repo_id, commit_message="Update model"):

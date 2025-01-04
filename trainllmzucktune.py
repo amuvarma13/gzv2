@@ -61,7 +61,7 @@ model.resize_token_embeddings(len(tokenizer))
 special_config =  model.config
 # output_dir = "amuvarma/e2e-1"
 # output_dir = "amuvarma/snac-2m-proj-qa-speechqa-14374"
-output_dir = "amuvarma/zuck-only-project-text-train"
+output_dir = "./models/checkpoint-14374"
 # print(model)
 
 
@@ -74,7 +74,7 @@ print("after loading")
 # print(model)
 
 # dsn = "amuvarma/voice-assistant-200k-processed-1"
-dsn = "amuvarma/zuckqa-with-qaaudio-total-cast-snacced"# dsn = "amuvarma/mls-eng-10k-dev-3k"
+dsn = "amuvarma/all_qas-audio"# dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
 # ds = ds.select(range(10000, 199999))
 def remove_short_audio(dataset, min_seconds=1.0):

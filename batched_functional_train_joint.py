@@ -101,7 +101,8 @@ def remove_short_audio(dataset, min_seconds=1.0):
 
     return filtered_dataset
 
-filtered_ds = remove_short_audio(ds1)
+filtered_ds1 = remove_short_audio(ds1)
+filtered_ds2 = remove_short_audio(ds2)
 
 
 class BatchedAlternatingDataset(Dataset):
@@ -174,7 +175,7 @@ class FSDPTrainer(Trainer):
             wandb.log({"audio_loss": logs["loss"], "step": global_step})
 
 batch_total = number_processes * batch_size
-train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
+train_dataset = BatchedAlternatingDataset(filtered_ds1, filtered_ds2, batch_total)
 
 
 print(train_dataset)
@@ -264,7 +265,7 @@ training_args = TrainingArguments(
     output_dir="./modelsaltbatch",
     per_device_train_batch_size=batch_size,
     num_train_epochs=1,
-    learning_rate=2e-5, 
+    learning_rate=2e-4, 
     logging_steps=1,
     evaluation_strategy="no",
     report_to="wandb",

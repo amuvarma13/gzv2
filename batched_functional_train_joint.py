@@ -23,8 +23,8 @@ from gzf import (
     GazelleProcessor,
 )
 
-batch_size = 8
-number_processes = 8
+batch_size = 2
+number_processes = 2
 
 MODEL_FOR_CAUSAL_LM_MAPPING.register(
     "gazelle", GazelleForConditionalGeneration)
@@ -62,7 +62,7 @@ config = GazelleConfig(
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
 special_config =  model.config
 # output_dir = "models/checkpoint-78"
-output_dir = "hm_model-proj-2/checkpoint-2943"
+output_dir = "amuvarma/zuck-only-project-audio-train-3-qa"
 model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
 for param in model.parameters():
@@ -70,29 +70,20 @@ for param in model.parameters():
 
 special_config = model.config
 wandb.init(
-    project="gazelle-tune-llm-alt-conts",
-    name="r7-12-2"
+    project="gazelle-tune",
+    name="r0-4-1"
 )
 
-file_path = 'transcribe_exps.txt'
 
 print(model)
 
-try:
-    with open(file_path, 'r', encoding='utf-8') as file:
-        expressions = [line.strip() for line in file if line.strip()]
-except FileNotFoundError:
-    print(f"The file {file_path} does not exist.")
-except IOError:
-    print(f"An error occurred while reading the file {file_path}.")
 
 
-
-dsn1 = "amuvarma/voice-assistant-250-300k-processed"
-dsn2 ="amuvarma/va-330k-380k-snac-StTtS"
+dsn1 = "amuvarma/zuckqa-with-qaaudio-total-cast-snacced"
+dsn2 ="amuvarma/va-320k-330k-snac-no-identity"
 
 ds1 = load_dataset(dsn1, split="train")
-ds1 = ds1.select(range(0, 100))
+ds2 = load_dataset(dsn2, split="train")
 
 def remove_short_audio(dataset, min_seconds=1.0):
     indices_to_keep = []
@@ -109,7 +100,7 @@ def remove_short_audio(dataset, min_seconds=1.0):
 
 filtered_ds = remove_short_audio(ds1)
 
-ds2 = load_dataset(dsn2, split="train")
+
 
 
 
@@ -186,10 +177,6 @@ batch_total = number_processes * batch_size
 train_dataset = BatchedAlternatingDataset(ds2, ds2, batch_total)
 
 
-
-
-
-
 print(train_dataset)
 
 
@@ -199,10 +186,10 @@ for param in model.parameters():
     param.requires_grad = False
 
 for name, param in model.named_parameters():
-    # if "multi_modal_projector" in name:
-    #     param.requires_grad = True
-    if "language_model" in name:
+    if "multi_modal_projector" in name:
         param.requires_grad = True
+    # if "language_model" in name:
+    #     param.requires_grad = True
 
 
 audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
@@ -214,18 +201,9 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
 
     user_input_ids = tokenizer(user_res, return_tensors="pt").input_ids
     assistant_input_ids = tokenizer(ass_res, return_tensors="pt").input_ids
-
-    start_of_system = torch.tensor([[128256+8]], dtype=torch.int64)
-    end_of_system = torch.tensor([[128256+9]], dtype=torch.int64)
-    end_of_text = torch.tensor([[128009]], dtype=torch.int64)
-
     content_tensor = torch.tensor([content_tokens], dtype=torch.int64)
     content_tensor = content_tensor + 128266
 
-    system_message = "You are an AI assistant who will answer the user's questions and follow the user's instructions."
-    system_input_ids = tokenizer(system_message, return_tensors="pt").input_ids
-    system_tokens = torch.cat(
-        [start_of_system, system_input_ids, end_of_text, end_of_system],  dim=1)
 
     start_token = torch.tensor([[128259]], dtype=torch.int64)
     end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
@@ -233,16 +211,14 @@ def inference_collator(audio_input, user_res, ass_res, content_tokens):
     post_assistant_tokens = torch.tensor([[128258, 128262]])
 
     user_tokens = torch.cat(
-        [system_tokens, start_token, user_input_ids, end_tokens], dim=1)
-
-
+        [start_token, user_input_ids, end_tokens], dim=1)
     
     if len(content_tokens):
-            labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
+            labels = torch.cat([start_token, user_input_ids, end_tokens,
                       assistant_input_ids, final_tokens, content_tensor, post_assistant_tokens], dim=1)
             
     else:
-        labels = torch.cat([system_tokens, start_token, user_input_ids, end_tokens,
+        labels = torch.cat([start_token, user_input_ids, end_tokens,
                       assistant_input_ids, final_tokens], dim=1)
 
 
@@ -269,8 +245,8 @@ class AudioChatDataCollator:
         assistant_response = features[0]["answer"]
         user_response = "<|audio|>"
         content_tokens = []
-        if("snac_tokens" in features[0]):
-            content_tokens = features[0]["snac_tokens"]
+        if("codes_list" in features[0]):
+            content_tokens = features[0]["codes_list"]
 
         batch = inference_collator(audio, user_response, assistant_response, content_tokens)
 

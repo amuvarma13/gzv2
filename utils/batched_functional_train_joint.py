@@ -17,7 +17,7 @@ from transformers import CONFIG_MAPPING
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING
 
 # dsn1 = "amuvarma/voice-assistant-250-255k-processed"
-dsn1 = "amuvarma/voice-assistant-250-300k-processed"
+dsn1 = "amuvarma/va-320k-330k-snac-no-identity"
 dsn2 = "amuvarma/26k-stts-duplex-convos-raw-fac-1dups-contentonly"
 
 ds1 = load_dataset(dsn1, split="train")

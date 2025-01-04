@@ -37,7 +37,7 @@ elif torch.backends.mps.is_available():
     print(f"Using {device} device")
 
 
-
+model_id = "./mymodel"
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h",
     text_model_id=model_id,

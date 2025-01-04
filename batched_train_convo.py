@@ -215,8 +215,8 @@ class AudioChatDataCollator:
 
         # Convert to tensor
         audios = torch.tensor(padded_sequences)
-        input_ids = features[0]["input_ids"]
-        attention_mask = [1] * len(input_ids)
+        input_ids = torch.tensor([features[0]["input_ids"]], dtype=torch.int64)
+        attention_mask = torch.ones_like(input_ids)
 
         return {
             "audio_values": audios.cpu(),

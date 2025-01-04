@@ -74,7 +74,7 @@ print("after loading")
 # print(model)
 
 # dsn = "amuvarma/voice-assistant-200k-processed-1"
-dsn = "amuvarma/all_qas-audio"# dsn = "amuvarma/mls-eng-10k-dev-3k"
+dsn = "amuvarma/zuck-qa-ds-no-identity"
 ds = load_dataset(dsn, split="train")
 # ds = ds.select(range(10000, 199999))
 def remove_short_audio(dataset, min_seconds=1.0):

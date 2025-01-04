@@ -48,7 +48,18 @@ config = GazelleConfig(
 
 )
 
+model_id = "./mymodel"
+config = GazelleConfig(
+    audio_model_id="facebook/wav2vec2-base-960h",
+    text_model_id=model_id,
+    audio_token_index=156939,  # Updated audio_token_index
+    vocab_size=156939,  # Updated vocab_size
+)
 model = GazelleForConditionalGeneration(config).to(dtype=dtype)
+special_config =  model.config
+# output_dir = "models/checkpoint-78"
+output_dir = "checkpoints/checkpoint-490"
+model = GazelleForConditionalGeneration.from_pretrained(output_dir, config=special_config, new_vocab_size=True)
 
 tokenizer = transformers.AutoTokenizer.from_pretrained(
     "meta-llama/Llama-3.2-3B-Instruct")
@@ -196,7 +207,7 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./models",
+    output_dir="./modelssnac",
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,  # Changed to 16
     num_train_epochs=1,
@@ -225,20 +236,3 @@ print("training")
 
 trainer.train()
 
-
-# Save model and tokenizer
-output_dir = "trained_model"
-# trainer.save_model(output_dir)
-print(trainer.model)
-
-trainer.model.save_pretrained(output_dir, safe_serialization=True)
-
-
-print("Loading the model using GazelleForConditionalGeneration directly")
-try:
-
-    loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(
-        output_dir, config=special_config, new_vocab_size=True)
-    print("Loaded model with custom class:", loaded_model_custom)
-except Exception as e:
-    print("Error during model loading with GazelleForConditionalGeneration:", e)

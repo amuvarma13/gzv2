@@ -91,7 +91,7 @@ except IOError:
     print(f"An error occurred while reading the file {file_path}.")
 
 
-dsn = "amuvarma/zuck-qa-ds-no-identity"
+dsn = "amuvarma/snacced-flat-zuck-convo-sttsed"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
 
@@ -185,7 +185,7 @@ class AudioChatDataCollator:
         self.greeting = "Hello world."
 
     def __call__(self, features):
-        audio = torch.tensor([features[0]["audio"]["array"]])
+        audio = torch.tensor([features[0]["answer_audio"]["array"]])
         assistant_response = features[0]["assistant"]
         user_response = features[0]["user"]
 
@@ -206,7 +206,7 @@ print("creating trainer")
 
 training_args = TrainingArguments(
     output_dir="./modelssnac",
-    per_device_train_batch_size=4,
+    per_device_train_batch_size=1,
     gradient_accumulation_steps=1,  # Changed to 16
     num_train_epochs=1,
     learning_rate=2e-5,  # Changed to 2*10^-3

@@ -77,9 +77,9 @@ wandb.init(
 
 print(model)
 
-# dsn1 = "amuvarma/snacced-zuck-convo-sttsed-proc-no-discrepancies"
+dsn1 = "amuvarma/snacced-zuck-convo-sttsed-proc-no-discrepancies"
 # dsn2 = "amuvarma/snacced-zuck-convo-sttsed-proc-no-discrepancies"
-dsn1 = "amuvarma/qa_pairs_regular-sttsed-proc"
+# dsn1 = "amuvarma/qa_pairs_regular-sttsed-proc"
 dsn2 = "amuvarma/qa_pairs_regular-sttsed-proc"
 
 # dsn1 = "amuvarma/zuckqa-with-qaaudio-total-cast-snacced"

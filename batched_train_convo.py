@@ -204,7 +204,17 @@ class AudioChatDataCollator:
         self.greeting = "Hello world."
 
     def __call__(self, features):
-        audios = torch.tensor([features[0]["audios"]])
+        # Find the length of the longest sequence
+        max_len = max(len(seq) for seq in features[0]["audios"])
+
+        # Create padded sequences
+        padded_sequences = []
+        for seq in features[0]["audios"]:
+            padded = seq + [0] * (max_len - len(seq))  # Zero padding
+            padded_sequences.append(padded)
+
+        # Convert to tensor
+        audios = torch.tensor(padded_sequences)
         input_ids = features[0]["input_ids"]
         attention_mask = [1] * len(input_ids)
 

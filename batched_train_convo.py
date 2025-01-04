@@ -242,7 +242,7 @@ training_args = TrainingArguments(
     remove_unused_columns=False,
     lr_scheduler_type="cosine",
     bf16=True,
-    save_steps=1000
+    save_steps=490
 )
 
 trainer = FSDPTrainer(

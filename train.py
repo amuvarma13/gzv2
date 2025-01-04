@@ -37,8 +37,6 @@ elif torch.backends.mps.is_available():
     print(f"Using {device} device")
 
 
-model_id = "amuvarma/zuck-tttts-convo-checkpoint-500-noidentity"
-
 
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h",
@@ -93,7 +91,7 @@ except IOError:
     print(f"An error occurred while reading the file {file_path}.")
 
 
-dsn = "amuvarma/proj-train-qa-and-speechqa"
+dsn = "amuvarma/zuck-qa-ds-no-identity"
 # dsn = "amuvarma/mls-eng-10k-dev-3k"
 ds = load_dataset(dsn, split="train")
 
@@ -208,8 +206,8 @@ print("creating trainer")
 
 training_args = TrainingArguments(
     output_dir="./modelssnac",
-    per_device_train_batch_size=4,
-    gradient_accumulation_steps=2,  # Changed to 16
+    per_device_train_batch_size=1,
+    gradient_accumulation_steps=1,  # Changed to 16
     num_train_epochs=1,
     learning_rate=2e-3,  # Changed to 2*10^-3
     # save_strategy="no",

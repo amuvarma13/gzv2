@@ -77,9 +77,12 @@ wandb.init(
 
 print(model)
 
-# dsn1 = "amuvarma/zuckqa-with-qaaudio-total-cast-snacced"
+dsn1 = "amuvarma/zuckqa-with-qaaudio-total-cast-snacced"
 dsn2 = "amuvarma/va-320k-330k-snac-no-identity"
-dsn1 = "amuvarma/va-320k-330k-snac-no-identity"
+# dsn1 = "amuvarma/va-320k-330k-snac-no-identity"
+
+# dsn1 = "amuvarma/zuckqa-with-qaaudio-total-cast-snacced"
+# dsn2  = "amuvarma/zuckqa-with-qaaudio-total-cast-snacced"
 
 
 ds1 = load_dataset(dsn1, split="train")
@@ -171,7 +174,7 @@ class FSDPTrainer(Trainer):
             wandb.log({"audio_loss": logs["loss"], "step": global_step})
 
 batch_total = number_processes * batch_size
-train_dataset = BatchedAlternatingDataset(ds2, ds2, batch_total)
+train_dataset = BatchedAlternatingDataset(ds1, ds2, batch_total)
 
 
 print(train_dataset)

@@ -155,7 +155,7 @@ class FSDPTrainer(Trainer):
             num_workers=0,
             pin_memory=self.args.dataloader_pin_memory,
         )
-    def log(self, logs, **kwargs):
+    def log(self, logs, extra):
         super().log(logs)
         global_step = self.state.global_step
         

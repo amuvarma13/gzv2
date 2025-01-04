@@ -2,7 +2,7 @@ from huggingface_hub import HfApi
 import os
 
 
-base_repo_id = "modelsaltbatch/checkpoint-1229"
+base_repo_id = "modelssnac/checkpoint-1229"
 upload_name = "amuvarma/zuck-post-final-tune-att2"
 
 

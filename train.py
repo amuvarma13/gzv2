@@ -206,7 +206,7 @@ print("creating trainer")
 
 training_args = TrainingArguments(
     output_dir="./modelssnac",
-    per_device_train_batch_size=1,
+    per_device_train_batch_size=4,
     gradient_accumulation_steps=1,  # Changed to 16
     num_train_epochs=1,
     learning_rate=2e-3,  # Changed to 2*10^-3

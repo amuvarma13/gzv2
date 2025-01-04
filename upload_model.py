@@ -2,8 +2,8 @@ from huggingface_hub import HfApi
 import os
 
 
-base_repo_id = "modelsaltbatch/checkpoint-490"
-upload_name = "amuvarma/zuck-post-final-tune"
+base_repo_id = "modelsaltbatch/checkpoint-1229"
+upload_name = "amuvarma/zuck-post-final-tune-att2"
 
 
 def push_folder_to_hub(local_folder, repo_id, commit_message="Update model"):

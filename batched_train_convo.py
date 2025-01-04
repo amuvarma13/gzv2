@@ -230,7 +230,7 @@ class AudioChatDataCollator:
 print("creating trainer")
 
 training_args = TrainingArguments(
-    output_dir="./modelsaltbatch",
+    output_dir="./checkpoints",
     per_device_train_batch_size=batch_size,
     num_train_epochs=1,
     learning_rate=2e-4, 

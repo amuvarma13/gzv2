@@ -2,8 +2,8 @@ from huggingface_hub import HfApi
 import os
 
 
-base_repo_id = "models/checkpoint-14374"
-upload_name = "amuvarma/zuck-only-project-audio-train-3-projonly"
+base_repo_id = "modelsaltbatch/checkpoint-2974"
+upload_name = "amuvarma/zuck-proj-tune-batchalt"
 
 
 def push_folder_to_hub(local_folder, repo_id, commit_message="Update model"):

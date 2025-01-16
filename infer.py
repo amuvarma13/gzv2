@@ -1,4 +1,4 @@
-from gzv2.gzf import (
+from gzv2 import (
     GazelleConfig,
     GazelleForConditionalGeneration,
     GazelleProcessor,

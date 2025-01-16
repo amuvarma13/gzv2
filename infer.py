@@ -106,11 +106,6 @@ def new_inference_collator():
 user_tokens = new_inference_collator()
 
 
-from gzv2.gzf import (
-    GazelleConfig,
-    GazelleForConditionalGeneration,
-    GazelleProcessor,
-)
 
 text_model_id = "amuvarma/snac-pretrain-2m-96000"
 mm_model_id = "amuvarma/3b-2m-proj-checkpoint-14375-0"

@@ -73,6 +73,8 @@ audio_processor = transformers.Wav2Vec2Processor.from_pretrained(
 import torchaudio
 from IPython.display import Audio
 
+sound = AudioSegment.from_mp3("3.mp3")
+sound.export("recorded_audio.wav", format="wav")
 test_audio1, sr1 = torchaudio.load("recorded_audio.wav")
 dtype = torch.float32
 

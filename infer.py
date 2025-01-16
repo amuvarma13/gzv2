@@ -1,4 +1,4 @@
-from gzv2.modelling_gazelle import (
+from gzf.modelling_gazelle import (
     GazelleConfig,
     GazelleForConditionalGeneration,
     GazelleProcessor,

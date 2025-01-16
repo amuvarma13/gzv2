@@ -659,7 +659,6 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
         >>> processor.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
         "\nUSER: What's the content of the image?\nASSISTANT: The image features a stop sign on a street corner"
         ```"""
-        print("in forward pass")
         output_attentions = (
             output_attentions
             if output_attentions is not None

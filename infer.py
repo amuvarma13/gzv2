@@ -4,10 +4,8 @@ from gzv2.gzf import (
     GazelleProcessor,
 )
 
-!pip install pydub
 from pydub import AudioSegment
-!pip install snac ipywebrtc
-!huggingface-cli login --token=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
+
 from snac import SNAC
 import torch
 

@@ -519,7 +519,6 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
         # 1. Create a mask to know where special image tokens are
         special_audio_token_mask = input_ids == self.config.audio_token_index
         num_special_image_tokens = torch.sum(special_audio_token_mask, dim=-1)
-        print(num_special_image_tokens)
         # Compute the maximum embed dimension
         max_embed_dim = (
             num_special_image_tokens.max() * (num_audio_patches - 1)

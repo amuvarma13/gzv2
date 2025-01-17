@@ -127,7 +127,7 @@ loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(mm_model_i
 loaded_model_custom = loaded_model_custom.to("cuda").to(torch.bfloat16)
 
 myinputs= {
-  # "audio_values": audio_values.to(loaded_model_custom.device).to(torch.bfloat16),
+  "audio_values": audio_values.to(loaded_model_custom.device).to(torch.bfloat16),
   "input_ids": user_tokens.to(loaded_model_custom.device),
   # "input_ids": tokenizer("How does Facebook manage user privacy?", return_tensors="pt").input_ids.to("cuda")
 }

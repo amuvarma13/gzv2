@@ -87,7 +87,7 @@ audio_values1 = audio_processor(
 ).input_values
 
 
-audio_values = torch.cat([audio_values1], dim=0)
+audio_values = torch.cat(audio_values1, dim=0)
 
 
 #@title Create inference collator

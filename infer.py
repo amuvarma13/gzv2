@@ -82,6 +82,8 @@ if sr1 != 16000:
     print("resampling audio")
     test_audio = torchaudio.transforms.Resample(sr1, 16000)(test_audio1)
 
+print("test_audio",test_audio.shape)
+
 audio_values1 = audio_processor(
     audio=test_audio, return_tensors="pt", sampling_rate=16000
 ).input_values
@@ -90,6 +92,7 @@ audio_values1 = audio_processor(
 # audio_values = torch.cat(audio_values1, dim=0)
 
 audio_values = audio_values1
+print("audio_values",audio_values.shape)
 #@title Create inference collator
 def new_inference_collator():
     # user_phrase = "Okay so what would be a healthier breakfast option then? Can you tell me?"

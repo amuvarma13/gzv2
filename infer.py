@@ -110,8 +110,8 @@ user_tokens = new_inference_collator()
 text_model_id = "amuvarma/snac-pretrain-2m-96000"
 mm_model_id = "amuvarma/3b-2m-proj-checkpoint-14375-0"
 
-download_model(text_model_id)
-download_model(mm_model_id)
+# download_model(text_model_id)
+# download_model(mm_model_id)
 model_id = text_model_id
 config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h",

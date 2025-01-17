@@ -87,9 +87,9 @@ audio_values1 = audio_processor(
 ).input_values
 
 
-audio_values = torch.cat(audio_values1, dim=0)
+# audio_values = torch.cat(audio_values1, dim=0)
 
-
+audio_values = audio_values1
 #@title Create inference collator
 def new_inference_collator():
     # user_phrase = "Okay so what would be a healthier breakfast option then? Can you tell me?"

@@ -661,6 +661,7 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
         "\nUSER: What's the content of the image?\nASSISTANT: The image features a stop sign on a street corner"
         ```"""
         print("in forward pass")
+        print("audio values", audio_values.shape)
         output_attentions = (
             output_attentions
             if output_attentions is not None
@@ -686,6 +687,7 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
                 and audio_values.shape[1] > 1
                 and input_ids.shape[1] != 1
             ):
+                print("audio values is not none")
                 audio_tower_outputs = self.audio_tower(audio_values).last_hidden_state
 
                 audio_features = self.multi_modal_projector(audio_tower_outputs)
@@ -702,6 +704,7 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
                         attention_mask, self.config.ignore_index
                     ).to(torch.long)
             else:
+                print("audio values is none")
                 # In case input_ids.shape[1] == 1 & audio_values==None & past_key_values != None, we are in the case of
                 # generation with cache
                 if (

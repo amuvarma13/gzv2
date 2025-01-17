@@ -117,7 +117,7 @@ config = GazelleConfig(
     audio_model_id="facebook/wav2vec2-base-960h",
     text_model_id=model_id,
     audio_token_index=156939,
-    vocab_size=156940,
+    vocab_size=156939,
 )
 model = GazelleForConditionalGeneration(config).to(dtype=torch.bfloat16)
 model.resize_token_embeddings(len(tokenizer))
@@ -146,4 +146,4 @@ with torch.no_grad():
       )
 
 end_time = time.time()
-print("total time", end_time - start_time)
+print(tokenizer.decode(outs[0]))

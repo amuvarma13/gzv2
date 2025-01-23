@@ -1,5 +1,5 @@
 """Gazelle is a joint speech-language model for end-to-end voice conversation."""
-from .modelling_gazelle_whisper import (
+from .whisper_md_3b import (
     GazelleConfig,
     GazelleForConditionalGeneration,
     GazellePreTrainedModel,

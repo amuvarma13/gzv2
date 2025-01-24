@@ -187,15 +187,6 @@ def get_all_embeds(existing_embeds, audio_features):
     audio_features = audio_features.to(dtype=torch.bfloat16).to(loaded_model_custom.device)
     audio_embeds = loaded_model_custom.multi_modal_projector(audio_features)
 
-    text = "Change "
-    text_tokens = tokenizer(text, return_tensors="pt").input_ids
-    text_tokens = text_tokens.to(loaded_model_custom.device)
-    text_embeds = loaded_model_custom.get_input_embeddings()(text_tokens)
-    text2 = " into a written transcript"
-    text2_tokens = tokenizer(text2, return_tensors="pt").input_ids
-    text2_tokens = text2_tokens.to(loaded_model_custom.device)
-    text2_embeds = loaded_model_custom.get_input_embeddings()(text2_tokens)
-
 
   start_token = torch.tensor([[128259, 128000]], dtype=torch.int64)
   end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
@@ -210,7 +201,7 @@ def get_all_embeds(existing_embeds, audio_features):
   end_embeds = end_embeds.to(dtype=torch.bfloat16)
   final_embeds = final_embeds.to(dtype=torch.bfloat16)
   if existing_embeds is not None:
-    all_embeds = torch.cat([existing_embeds, start_embeds, text_embeds, audio_embeds, text2_embeds, end_embeds], dim=1)
+    all_embeds = torch.cat([existing_embeds, start_embeds, audio_embeds, end_embeds], dim=1)
   else:
     all_embeds = torch.cat([start_embeds, audio_embeds, end_embeds], dim=1)
   print("all_embeds.shape", all_embeds.shape)

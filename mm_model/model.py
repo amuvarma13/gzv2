@@ -20,6 +20,7 @@ whispermodel = whisper.load_model("small")
 from mm_model.components import GazelleProjector
 from mm_model.config import GazelleConfig
 
+@dataclass
 class GazelleCausalLMOutputWithPast(ModelOutput):
     """
     Base class for Gazelle causal language model (or autoregressive) outputs.

@@ -70,7 +70,6 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
             self.language_model = AutoModelForCausalLM.from_pretrained(
                 config.text_model_id, 
                 attn_implementation=config._attn_implementation
-                # attn_implementation="flash_attention_2"
             )
             if(new_vocab_size is not None):
                 self.language_model.resize_token_embeddings(156940)
@@ -78,7 +77,6 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
             self.language_model = AutoModelForCausalLM.from_config(
                 config.text_config, 
                 attn_implementation=config._attn_implementation
-                # attn_implementation="flash_attention_2"
 
             )
         self.pad_token_id = (
@@ -127,10 +125,8 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
         left_padding = not torch.sum(
             input_ids[:, -1] == torch.tensor(self.pad_token_id)
         )
-        # 1. Create a mask to know where special image tokens are
         special_audio_token_mask = input_ids == self.config.audio_token_index
         num_special_image_tokens = torch.sum(special_audio_token_mask, dim=-1)
-        # Compute the maximum embed dimension
         max_embed_dim = (
             num_special_image_tokens.max() * (num_audio_patches - 1)
         ) + sequence_length
@@ -138,11 +134,6 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
             input_ids != self.config.audio_token_index
         )
 
-        # 2. Compute the positions where text should be written
-        # Calculate new positions for text tokens in merged audio-text sequence.
-        # `special_audio_token_mask` identifies audio tokens. Each audio token will be replaced by `nb_text_tokens_per_images - 1` text tokens.
-        # `torch.cumsum` computes how each audio token shifts subsequent text token positions.
-        # - 1 to adjust for zero-based indexing, as `cumsum` inherently increases indices by one.
         new_token_positions = (
             torch.cumsum((special_audio_token_mask * (num_audio_patches - 1) + 1), -1)
             - 1
@@ -152,7 +143,6 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
             new_token_positions += nb_image_pad[:, None]  # offset for left padding
         text_to_overwrite = new_token_positions[batch_indices, non_audio_indices]
 
-        # 3. Create the full embedding, already padded to the maximum position
         final_embedding = torch.zeros(
             batch_size,
             max_embed_dim,
@@ -267,10 +257,6 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
                 and input_ids.shape[1] != 1
             ):
                 
-                # print("audio_values", audio_values.shape)
-                # audio_tower_outputs = self.audio_tower(audio_values).last_hidden_state
-                # print("output shape of audio_tower", audio_tower_outputs.shape) #torch.Size([1, 608, 768])
-
                 audio_features = self.multi_modal_projector(audio_values)
                 (
                     inputs_embeds,
@@ -285,23 +271,19 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
                         attention_mask, self.config.ignore_index
                     ).to(torch.long)
             else:
-                # In case input_ids.shape[1] == 1 & audio_values==None & past_key_values != None, we are in the case of
-                # generation with cache
+
                 if (
                     past_key_values is not None
                     and audio_values is not None
                     and input_ids.shape[1] == 1
                 ):
-                    # Retrieve the first layer to inspect the logits and mask out the hidden states
-                    # that are set to 0
+
                     first_layer_past_key_value = past_key_values[0][0][:, :, :, 0]
 
-                    # Sum all dimensions of head_dim (-2) to avoid random errors such as: https://github.com/huggingface/transformers/pull/28032#issuecomment-1863691941
                     batch_index, non_attended_tokens = torch.where(
                         first_layer_past_key_value.float().sum(-2) == 0
                     )
 
-                    # Get the target length
                     target_seqlen = first_layer_past_key_value.shape[-1] + 1
 
                     extended_attention_mask = torch.ones(
@@ -313,16 +295,12 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
                         device=attention_mask.device,
                     )
 
-                    # Filter out only the tokens that can be un-attended, this can happen
-                    # if one uses Llava + Fused modules where the cache on the
-                    # first iteration is already big enough, or if one passes custom cache
                     valid_indices = non_attended_tokens < extended_attention_mask.size(
                         -1
                     )
                     new_batch_index = batch_index[valid_indices]
                     new_non_attended_tokens = non_attended_tokens[valid_indices]
 
-                    # Zero-out the places where we don't need to attend
                     extended_attention_mask[
                         new_batch_index, new_non_attended_tokens
                     ] = 0
@@ -347,7 +325,6 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
 
         loss = None
         if labels is not None:
-            # Shift so that tokens < n predict n
             if attention_mask is not None:
                 shift_attention_mask = attention_mask[..., 1:]
                 shift_logits = logits[..., :-1, :][
@@ -359,7 +336,6 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
             else:
                 shift_logits = logits[..., :-1, :].contiguous()
                 shift_labels = labels[..., 1:].contiguous()
-            # Flatten the tokens
             loss_fct = nn.CrossEntropyLoss()
             loss = loss_fct(
                 shift_logits.view(-1, shift_logits.size(-1)),
@@ -394,24 +370,17 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
             else:
                 cache_length = past_length = past_key_values[0][0].shape[2]
 
-            # Keep only the unprocessed tokens:
-            # 1 - If the length of the attention_mask exceeds the length of input_ids, then we are in a setting where
-            # some of the inputs are exclusively passed as part of the cache (e.g. when passing input_embeds as
-            # input)
             if (
                 attention_mask is not None
                 and attention_mask.shape[1] > input_ids.shape[1]
             ):
                 input_ids = input_ids[:, -(attention_mask.shape[1] - past_length) :]
-            # 2 - If the past_length is smaller than input_ids', then input_ids holds all input tokens. We can discard
-            # input_ids based on the past_length.
+
             elif past_length < input_ids.shape[1]:
                 input_ids = input_ids[:, past_length:]
-            # 3 - Otherwise (past_length >= input_ids.shape[1]), let's assume input_ids only has unprocessed tokens.
             elif self.config.audio_token_index in input_ids:
                 input_ids = input_ids[:, input_ids.shape[1] - 1 :]
-            # If the cache has seen more tokens than it can hold, then the cache has a size limit. Let's discard the
-            # older attention values, as their corresponding values are not part of the input.
+
             if cache_length < past_length and attention_mask is not None:
                 attention_mask = attention_mask[
                     :, -(cache_length + input_ids.shape[1]) :
@@ -425,7 +394,6 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
             if past_key_values:
                 position_ids = position_ids[:, -input_ids.shape[1] :]
 
-        # if `inputs_embeds` are passed, we only want to use them in the 1st generation step
         if inputs_embeds is not None and past_key_values is None:
             model_inputs = {"inputs_embeds": inputs_embeds}
         else:

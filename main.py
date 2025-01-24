@@ -6,7 +6,7 @@ mdn = "meta-llama/Llama-3.2-3B-Instruct"
 tokenizer = AutoTokenizer.from_pretrained(mdn)
 llm = LLM(mdn)
 from vllm import ModelRegistry
-from mm_model import (OrpheusForConditionalGeneration)
+from mm_model_vllm import (OrpheusForConditionalGeneration)
 
 ModelRegistry.register_model("OrpheusForConditionalGeneration", OrpheusForConditionalGeneration)
 model = AutoModel.from_pretrained(mdn)

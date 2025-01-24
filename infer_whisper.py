@@ -197,7 +197,7 @@ def get_all_embeds(existing_embeds, audio_features):
     text2_embeds = loaded_model_custom.get_input_embeddings()(text2_tokens)
 
 
-  start_token = torch.tensor([[128259]], dtype=torch.int64)
+  start_token = torch.tensor([[128259, 128000]], dtype=torch.int64)
   end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
   final_tokens = torch.tensor([[128262]], dtype=torch.int64)
   start_token = start_token.to(loaded_model_custom.device)

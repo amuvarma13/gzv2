@@ -1,6 +1,6 @@
 import time
 from vllm import LLM, SamplingParams
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer
 
 mdn = "meta-llama/Llama-3.2-3B-Instruct"
 tokenizer = AutoTokenizer.from_pretrained(mdn)
@@ -9,7 +9,7 @@ from vllm import ModelRegistry
 from mm_model_vllm import (OrpheusForConditionalGeneration)
 
 ModelRegistry.register_model("OrpheusForConditionalGeneration", OrpheusForConditionalGeneration)
-model = AutoModel.from_pretrained(mdn)
+model = OrpheusForConditionalGeneration.from_pretrained(mdn)
 
 def generate_output(prompt, llm, sampling_params):
     start_time = time.time()

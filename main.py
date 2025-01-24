@@ -36,6 +36,6 @@ def generate_output(prompt, llm, sampling_params):
     return generated_text
 
 prompt = "Here is a short story about a dragon:"
-sampling_params = SamplingParams(max_new_tokens=500)
+sampling_params = SamplingParams(max_tokens=500)
 generate_output(prompt, llm, sampling_params)
 

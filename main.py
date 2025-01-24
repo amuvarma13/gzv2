@@ -11,6 +11,8 @@ from mm_model_vllm import (OrpheusForConditionalGeneration)
 ModelRegistry.register_model("OrpheusForConditionalGeneration", OrpheusForConditionalGeneration)
 model = OrpheusForConditionalGeneration.from_pretrained(mdn)
 
+print(model)
+
 def generate_output(prompt, llm, sampling_params):
     start_time = time.time()
     

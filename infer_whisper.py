@@ -1,5 +1,5 @@
 from mm_model import (
-    GazelleConfig,
+    OrpheusConfig,
     OrpheusForConditionalGeneration,
 )
 
@@ -72,7 +72,7 @@ mm_model_id = "amuvarma/3b-zuckreg-convo-projsnactune"
 download_model(text_model_id)
 download_model(mm_model_id)
 model_id = text_model_id
-config = GazelleConfig(
+config = OrpheusConfig(
     audio_model_id="facebook/wav2vec2-base-960h",
     text_model_id=model_id,
     audio_token_index=156939,

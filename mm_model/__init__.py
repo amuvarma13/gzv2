@@ -1,6 +1,5 @@
-"""Gazelle is a joint speech-language model for end-to-end voice conversation."""
 from .model import (
-    GazelleConfig,
+    OrpheusConfig,
     OrpheusForConditionalGeneration,
     OrpheusPreTrainedModel,
 )

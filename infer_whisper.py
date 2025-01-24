@@ -78,11 +78,11 @@ config = GazelleConfig(
     audio_token_index=156939,
     vocab_size=156939,
 )
-model = GazelleForConditionalGeneration(config).to(dtype=torch.bfloat16)
+model = OrpheusForConditionalGeneration(config).to(dtype=torch.bfloat16)
 model.resize_token_embeddings(len(tokenizer))
 special_config =  model.config
 
-loaded_model_custom = GazelleForConditionalGeneration.from_pretrained(mm_model_id, config=special_config, new_vocab_size=False)
+loaded_model_custom = OrpheusForConditionalGeneration.from_pretrained(mm_model_id, config=special_config, new_vocab_size=False)
 loaded_model_custom = loaded_model_custom.to("cuda").to(torch.bfloat16)
 
 

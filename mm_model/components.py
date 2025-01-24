@@ -39,7 +39,7 @@ class ProjectionLayer(nn.Module):
     
 
 class OrpheusProjector(ProjectionLayer):
-    def __init__(self, config: GazelleConfig):
+    def __init__(self, config: OrpheusConfig):
         self.hidden_dim = config.hidden_size
         super().__init__(config.stack_factor)
         self.ln_pre = RMSNorm(config.audio_config.hidden_size * self.stack_factor)

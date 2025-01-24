@@ -36,7 +36,9 @@ class ProjectionLayer(nn.Module):
             B, T // self.stack_factor, C * self.stack_factor
         )
         return audio_embeds
-class GazelleProjector(ProjectionLayer):
+    
+
+class OrpheusProjector(ProjectionLayer):
     def __init__(self, config: GazelleConfig):
         self.hidden_dim = config.hidden_size
         super().__init__(config.stack_factor)

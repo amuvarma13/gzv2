@@ -1,10 +1,8 @@
 from transformers import PretrainedConfig, CONFIG_MAPPING
 
-
-class GazelleConfig(PretrainedConfig):
+class OrpheusConfig(PretrainedConfig):
     
     is_composition = False
-
     def __init__(
         self,
         audio_config=None,

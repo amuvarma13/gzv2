@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from config import GazelleConfig
 
 class RMSNorm(nn.Module):
     def __init__(self, hidden_size, eps=1e-6):

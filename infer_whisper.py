@@ -66,8 +66,8 @@ def download_model(model_id):
 )
   
 
-text_model_id= "amuvarma/3b-10m-pretrain-full"
-mm_model_id= "amuvarma/3b-zuckreg-convo"
+text_model_id= "amuvarma/3b-zuckreg-convo"
+mm_model_id = "amuvarma/3b-zuckreg-convo-projsnactune"
 
 download_model(text_model_id)
 download_model(mm_model_id)

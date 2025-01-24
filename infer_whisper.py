@@ -1,4 +1,4 @@
-from gzf import (
+from mm_model import (
     GazelleConfig,
     GazelleForConditionalGeneration,
 )

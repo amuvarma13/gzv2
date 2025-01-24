@@ -1,6 +1,4 @@
-from dataclasses import dataclass
 from typing import List, Optional, Tuple, Union
-
 import torch
 import torch.utils.checkpoint
 from torch import nn
@@ -8,94 +6,20 @@ from torch.nn import functional as F
 from transformers import (
     CONFIG_MAPPING,
     AutoModel,
-    BatchFeature,
     PretrainedConfig,
     PreTrainedModel,
-    ProcessorMixin,
-    TensorType,
     AutoModelForCausalLM
 )
-# from transformers import AutoModelForCausalLM
 from transformers.cache_utils import Cache
 from transformers.modeling_outputs import ModelOutput
-from transformers.tokenization_utils_base import (
-    PaddingStrategy,
-    PreTokenizedInput,
-    TextInput,
-    TruncationStrategy,
-)
 from transformers.utils import (
-    add_start_docstrings,
-    add_start_docstrings_to_model_forward,
     logging,
-    replace_return_docstrings,
 )
 import whisper
-
 whispermodel = whisper.load_model("small")
+from mm_model.components import GazelleProjector
+from mm_model.config import GazelleConfig
 
-
-
-logger = logging.get_logger(__name__)
-
-
-class GazelleConfig(PretrainedConfig):
-    
-    model_type = "gazelle"
-    is_composition = False
-
-    def __init__(
-        self,
-        audio_config=None,
-        text_config=None,
-        audio_model_id=None,
-        text_model_id=None,
-        ignore_index=-100,
-        audio_token_index=32000,
-        vocab_size=32000,
-        hidden_size=3072,
-        stack_factor=8,
-        projector_type="mlp",
-        **kwargs,
-    ):
-        self.ignore_index = ignore_index
-        self.audio_token_index = audio_token_index
-        self.vocab_size = vocab_size
-
-        self.audio_model_id = audio_model_id
-        self.text_model_id = text_model_id
-
-        self.audio_config = audio_config
-        self.text_config = text_config
-
-        self.hidden_size = hidden_size
-        print("self.hidden_size", self.hidden_size)
-        self.stack_factor = stack_factor
-        self.projector_type = projector_type
-
-        if isinstance(self.text_config, dict):
-            text_config["model_type"] = (
-                text_config["model_type"] if "model_type" in text_config else "llama"
-            )
-            self.text_config = CONFIG_MAPPING[text_config["model_type"]](**text_config)
-            self.vocab_size = self.text_config.vocab_size
-        elif text_config is None:
-            self.text_config = CONFIG_MAPPING["llama"]()
-        
-        if isinstance(self.audio_config, dict):
-            audio_config["model_type"] = (
-                audio_config["model_type"] if "model_type" in audio_config else "wav2vec2"
-            )
-            self.audio_config = CONFIG_MAPPING[audio_config["model_type"]](**audio_config)
-            self.vocab_size = self.audio_config.vocab_size
-        elif audio_config is None:
-            self.audio_config = CONFIG_MAPPING["wav2vec2"]()
-
-        super().__init__(**kwargs)
-
-
-@dataclass
-# Copied from transformers.models.idefics.modeling_idefics.IdeficsCausalLMOutputWithPast with Idefics-> Gazelle
 class GazelleCausalLMOutputWithPast(ModelOutput):
     """
     Base class for Gazelle causal language model (or autoregressive) outputs.
@@ -136,150 +60,6 @@ class GazelleCausalLMOutputWithPast(ModelOutput):
     audio_hidden_states: Optional[Tuple[torch.FloatTensor]] = None
 
 
-class ProjectionLayer(nn.Module):
-    def __init__(self, stack_factor: int = 8):
-        super().__init__()
-        # NB chua: stack_factor is the factor by which the audio embeddings are stacked
-        # ideally this should be picked according to your hardware and should be a multiple of 8!
-        # https://developer.nvidia.com/blog/optimizing-gpu-performance-tensor-cores/
-        self.stack_factor = stack_factor
-
-    def _pad_and_stack(self, audio_embeds: torch.Tensor) -> torch.Tensor:
-        "Stack audio embeddings to downsample in time dimension, then pad to the nearest multiple of `stack_factor`"
-        B, T, C = audio_embeds.shape
-        audio_embeds = F.pad(
-            audio_embeds, (0, 0, 0, self.stack_factor - T % self.stack_factor)
-        )
-        B, T, C = audio_embeds.shape
-        audio_embeds = audio_embeds.view(
-            B, T // self.stack_factor, C * self.stack_factor
-        )
-        return audio_embeds
-
-
-class RMSNorm(nn.Module):
-    def __init__(self, hidden_size, eps=1e-6):
-        """
-        From huggingface's LlamaRMSNorm
-        https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py#L75
-        """
-        super().__init__()
-        # the default initialization here is to 1
-        # however, https://arxiv.org/abs/2206.10139 shows stronger improvements initializing to smaller weights
-        # we arbitrarily pick 0.4 here, seemed like good results
-        self.weight = nn.Parameter(torch.full((hidden_size,), 0.4))
-        # self.weight = nn.Parameter(torch.ones(hidden_size))
-        self.variance_epsilon = eps
-
-    def forward(self, hidden_states):
-        input_dtype = hidden_states.dtype
-        hidden_states = hidden_states.to(torch.float32)
-        variance = hidden_states.pow(2).mean(-1, keepdim=True)
-        hidden_states = hidden_states * torch.rsqrt(variance + self.variance_epsilon)
-        return self.weight * hidden_states.to(input_dtype)
-
-
-class SwiGLU(nn.Module):
-    def forward(self, x):
-        x, gate = x.chunk(2, dim=-1)
-        return F.silu(gate) * x
-
-
-class GazelleProjector(ProjectionLayer):
-    def __init__(self, config: GazelleConfig):
-        self.hidden_dim = config.hidden_size
-        super().__init__(config.stack_factor)
-        self.ln_pre = RMSNorm(config.audio_config.hidden_size * self.stack_factor)
-        self.linear_1 = nn.Linear(
-            config.audio_config.hidden_size * self.stack_factor,
-            self.hidden_dim,
-            bias=False,
-        )
-        self.act = SwiGLU()
-        self.linear_2 = nn.Linear(
-            self.hidden_dim // 2, self.hidden_dim, bias=False
-        )
-        self.ln_post = RMSNorm(self.hidden_dim)
-
-    def forward(self, audio_features: torch.Tensor) -> torch.Tensor:
-        audio_features = self._pad_and_stack(audio_features)
-        audio_features = self.ln_pre(audio_features)
-        hidden_states = self.linear_1(audio_features)
-        hidden_states = self.act(hidden_states)
-        hidden_states = self.linear_2(hidden_states)
-        hidden_states = self.ln_post(hidden_states)
-        return hidden_states
-
-
-class GazelleHierarchalProjector(ProjectionLayer):
-    """Uses 2 stackings in the projection (e.g. 1 -> 4 -> 8)
-
-    Theory is that this learns a better local representation while still resulting in a smaller sequence length.
-    """
-
-    def _pad_and_stack(self, audio_embeds: torch.Tensor, stack_factor) -> torch.Tensor:
-        "Stack audio embeddings to downsample in time dimension, then pad to the nearest multiple of `stack_factor`"
-        B, T, C = audio_embeds.shape
-        audio_embeds = F.pad(audio_embeds, (0, 0, 0, stack_factor - T % stack_factor))
-        B, T, C = audio_embeds.shape
-        audio_embeds = audio_embeds.view(B, T // stack_factor, C * stack_factor)
-        return audio_embeds
-
-    def __init__(self, config: GazelleConfig):
-        self.hidden_dim = config.hidden_size
-        super().__init__(config.stack_factor)
-        self.ln_pre = RMSNorm(config.audio_config.hidden_size * self.stack_factor // 2)
-
-        self.mlp_one = nn.Sequential(
-            nn.Linear(
-                config.audio_config.hidden_size * (self.stack_factor // 2),
-                self.hidden_dim * 2,
-                bias=False,
-            ),
-            SwiGLU(),
-        )
-        self.mlp_two = nn.Sequential(
-            nn.Linear(
-                self.hidden_dim * 2,
-                config.text_config.hidden_size * 2,
-                bias=False,
-            ),
-            SwiGLU(),
-        )
-
-        self.ln_post = RMSNorm(config.text_config.hidden_size)
-
-    def forward(self, audio_features: torch.Tensor) -> torch.Tensor:
-        audio_features = self._pad_and_stack(audio_features, self.stack_factor // 2)
-        audio_features = self.ln_pre(audio_features)
-        hidden_states = self.mlp_one(audio_features)
-        hidden_states = self._pad_and_stack(hidden_states, 2)
-        hidden_states = self.mlp_two(hidden_states)
-        hidden_states = self.ln_post(hidden_states)
-        return hidden_states
-
-
-GAZELLE_START_DOCSTRING = r"""
-    This model inherits from [`PreTrainedModel`]. Check the superclass documentation for the generic methods the
-    library implements for all its model (such as downloading or saving, resizing the input embeddings, pruning heads
-    etc.)
-
-    This model is also a PyTorch [torch.nn.Module](https://pytorch.org/docs/stable/nn.html#torch.nn.Module) subclass.
-    Use it as a regular PyTorch Module and refer to the PyTorch documentation for all matter related to general usage
-    and behavior.
-
-    Parameters:
-        config ([`GazelleConfig`]):
-            Model configuration class with all the parameters of the model. Initializing with a config file does not
-            load the weights associated with the model, only the configuration. Check out the
-            [`~PreTrainedModel.from_pretrained`] method to load the model weights.
-"""
-
-
-@add_start_docstrings(
-    "The bare Gazelle Model outputting raw hidden-states without any specific head on top.",
-    GAZELLE_START_DOCSTRING,
-)
 class GazellePreTrainedModel(PreTrainedModel):
     config_class = GazelleConfig
     base_model_prefix = "gazelle"
@@ -314,53 +94,15 @@ class GazellePreTrainedModel(PreTrainedModel):
         SDPA or not.
         """
         return self.language_model._supports_sdpa
-
-
-
-@add_start_docstrings(
-    """The Gazelle model which consists of an audio backbone and a language model.""",
-    GAZELLE_START_DOCSTRING,
-)
-
-class whisperMLP(nn.Module):
-    def __init__(self, ) -> None:
-        super().__init__()
-        dim1 = 768
-        is_bias = True
-        n_embd = 3072
-        intermediate_size = 4* n_embd
-        self.fc_1 = nn.Linear(dim1, intermediate_size, bias=is_bias)
-        self.fc_2 = nn.Linear(dim1, intermediate_size, bias=is_bias)
-        self.proj = nn.Linear(intermediate_size, n_embd, bias=is_bias)
-
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x_fc_1 = self.fc_1(x)
-        x_fc_2 = self.fc_2(x)
-        x = torch.nn.functional.silu(x_fc_1) * x_fc_2
-        return self.proj(x)
-    
-
+ 
 class GazelleForConditionalGeneration(GazellePreTrainedModel):
     def __init__(self, config: GazelleConfig, new_vocab_size=False):
         super().__init__(config)
-        # if config.audio_model_id is not None:
-        #     self.audio_tower = AutoModel.from_pretrained(config.audio_model_id)
-        # else:
-        #     
+
         self.audio_tower = AutoModel.from_config(config.audio_config)
 
-        # self.audio_tower = whispermodel
-
-        # if (
-        #     "bert" in self.audio_tower.config.model_type.lower()
-        #     or self.config.projector_type == "hierarchal"
-        # ):
-        # self.multi_modal_projector = GazelleHierarchalProjector(config)
-        # else:
         self.multi_modal_projector = GazelleProjector(config)
 
-        # self.multi_modal_projector = whisperMLP()
         self.vocab_size = config.vocab_size
         if config.text_model_id is not None:
             self.language_model = AutoModelForCausalLM.from_pretrained(
@@ -741,151 +483,3 @@ class GazelleForConditionalGeneration(GazellePreTrainedModel):
     def _reorder_cache(self, *args, **kwargs):
         return self.language_model._reorder_cache(*args, **kwargs)
 
-
-# coding=utf-8
-# Copyright 2023 The HuggingFace Inc. team.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-"""
-Processor class for Gazelle.
-"""
-
-
-class GazelleProcessor(ProcessorMixin):
-    r"""
-    Constructs a Gazelle processor which wraps a Gazelle image processor and a Gazelle tokenizer into a single processor.
-
-    [`GazelleProcessor`] offers all the functionalities of [`Wav2Vec2Processor`] and [`LlamaTokenizerFast`]. See the
-    [`~GazelleProcessor.__call__`] and [`~GazelleProcessor.decode`] for more information.
-
-    Args:
-        audio_processor ([`Wav2Vec2Processor`, `SeamlessM4TFeatureExtractor`], *optional*):
-            The audio processor is a required input.
-        tokenizer ([`LlamaTokenizerFast`], *optional*):
-            The tokenizer is a required input.
-    """
-
-    attributes = ["audio_processor", "tokenizer"]
-    audio_processor_class = (
-        "Wav2Vec2Processor",
-        "SeamlessM4TFeatureExtractor",
-    )
-    tokenizer_class = (
-        "LlamaTokenizer",
-        "LlamaTokenizerFast",
-    )
-
-    def __init__(self, audio_processor=None, tokenizer=None):
-        super().__init__(audio_processor, tokenizer)
-
-    def __call__(
-        self,
-        text: Union[
-            TextInput, PreTokenizedInput, List[TextInput], List[PreTokenizedInput]
-        ] = None,
-        audio=None,
-        padding: Union[bool, str, PaddingStrategy] = False,
-        truncation: Union[bool, str, TruncationStrategy] = None,
-        max_length=None,
-        return_tensors: Optional[Union[str, TensorType]] = TensorType.PYTORCH,
-        sampling_rate: int = 16000,
-    ) -> BatchFeature:
-        """
-        Main method to prepare for the model one or several sequences(s) and image(s). This method forwards the `text`
-        and `kwargs` arguments to LlamaTokenizerFast's [`~LlamaTokenizerFast.__call__`] if `text` is not `None` to encode
-        the text. To prepare the image(s), this method forwards the `images` and `kwrags` arguments to
-        CLIPImageProcessor's [`~CLIPImageProcessor.__call__`] if `images` is not `None`. Please refer to the doctsring
-        of the above two methods for more information.
-
-        Args:
-            text (`str`, `List[str]`, `List[List[str]]`):
-                The sequence or batch of sequences to be encoded. Each sequence can be a string or a list of strings
-                (pretokenized string). If the sequences are provided as list of strings (pretokenized), you must set
-                `is_split_into_words=True` (to lift the ambiguity with a batch of sequences).
-            audio (`np.ndarray`, `torch.Tensor`, `List[np.ndarray]`, `List[torch.Tensor]`):
-                 The audio or batch of audios to be prepared. Each audio can be NumPy array or PyTorch tensor. In case of a
-                NumPy array/PyTorch tensor, each audio should be of shape (C, T), where C is a number of channels, and T the
-                sample length of the audio.
-            padding (`bool`, `str` or [`~utils.PaddingStrategy`], *optional*, defaults to `False`):
-                Select a strategy to pad the returned sequences (according to the model's padding side and padding
-                index) among:
-                - `True` or `'longest'`: Pad to the longest sequence in the batch (or no padding if only a single
-                  sequence if provided).
-                - `'max_length'`: Pad to a maximum length specified with the argument `max_length` or to the maximum
-                  acceptable input length for the model if that argument is not provided.
-                - `False` or `'do_not_pad'` (default): No padding (i.e., can output a batch with sequences of different
-                  lengths).
-            max_length (`int`, *optional*):
-                Maximum length of the returned list and optionally padding length (see above).
-            truncation (`bool`, *optional*):
-                Activates truncation to cut input sequences longer than `max_length` to `max_length`.
-            return_tensors (`str` or [`~utils.TensorType`], *optional*):
-                If set, will return tensors of a particular framework. Acceptable values are:
-
-                - `'tf'`: Return TensorFlow `tf.constant` objects.
-                - `'pt'`: Return PyTorch `torch.Tensor` objects.
-                - `'np'`: Return NumPy `np.ndarray` objects.
-                - `'jax'`: Return JAX `jnp.ndarray` objects.
-            sampling_rate (`int`, *optional*, defaults to 16000):
-                Sampling rate of the input audio. We expect 16kHz audio. Don't change this value unless you know what
-                you are doing.
-
-        Returns:
-            [`BatchFeature`]: A [`BatchFeature`] with the following fields:
-
-            - **input_ids** -- List of token ids to be fed to a model. Returned when `text` is not `None`.
-            - **attention_mask** -- List of indices specifying which tokens should be attended to by the model (when
-              `return_attention_mask=True` or if *"attention_mask"* is in `self.model_input_names` and if `text` is not
-              `None`).
-            - **audio_values** -- Processed audio values to be fed to a model. Returned when `audios` is not `None`.
-        """
-        if audio is not None and len(audio) > 0:
-            audio_values = self.audio_processor(
-                audio, return_tensors=return_tensors, sampling_rate=sampling_rate
-            ).input_features
-        else:
-            audio_values = None
-        if text is not None:
-            text_inputs = self.tokenizer(
-                text,
-                return_tensors=return_tensors,
-                padding=padding,
-                truncation=truncation,
-                max_length=max_length,
-            )
-            return BatchFeature(data={**text_inputs, "audio_values": audio_values})
-        else:
-            return BatchFeature(data={"audio_values": audio_values})
-
-    # Copied from transformers.models.clip.processing_clip.CLIPProcessor.batch_decode with CLIP->Llama
-    def batch_decode(self, *args, **kwargs):
-        """
-        This method forwards all its arguments to LlamaTokenizerFast's [`~PreTrainedTokenizer.batch_decode`]. Please
-        refer to the docstring of this method for more information.
-        """
-        return self.tokenizer.batch_decode(*args, **kwargs)
-
-    # Copied from transformers.models.clip.processing_clip.CLIPProcessor.decode with CLIP->Llama
-    def decode(self, *args, **kwargs):
-        """
-        This method forwards all its arguments to LlamaTokenizerFast's [`~PreTrainedTokenizer.decode`]. Please refer to
-        the docstring of this method for more information.
-        """
-        return self.tokenizer.decode(*args, **kwargs)
-
-    @property
-    # Copied from transformers.models.clip.processing_clip.CLIPProcessor.model_input_names
-    def model_input_names(self):
-        tokenizer_input_names = self.tokenizer.model_input_names
-        audio_processor_input_names = self.audio_processor_class.model_input_names
-        return list(dict.fromkeys(tokenizer_input_names + audio_processor_input_names))

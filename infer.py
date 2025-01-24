@@ -1,7 +1,6 @@
-from gzf import (
+from mm_model import (
     GazelleConfig,
     GazelleForConditionalGeneration,
-    GazelleProcessor,
 )
 
 from pydub import AudioSegment

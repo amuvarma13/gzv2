@@ -1,6 +1,6 @@
 from mm_model import (
     GazelleConfig,
-    GazelleForConditionalGeneration,
+    OrpheusForConditionalGeneration,
 )
 
 import soundfile as sf

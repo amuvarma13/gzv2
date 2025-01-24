@@ -13,9 +13,7 @@ from transformers import (
 from dataclasses import dataclass
 from transformers.cache_utils import Cache
 from transformers.modeling_outputs import ModelOutput
-from transformers.utils import (
-    logging,
-)
+
 import whisper
 whispermodel = whisper.load_model("small")
 from mm_model.components import GazelleProjector
@@ -57,7 +55,7 @@ class GazellePreTrainedModel(PreTrainedModel):
                 module.weight.data[module.padding_idx].zero_()
 
  
-class GazelleForConditionalGeneration(GazellePreTrainedModel):
+class OrpheusForConditionalGeneration(GazellePreTrainedModel):
     def __init__(self, config: GazelleConfig, new_vocab_size=False):
         super().__init__(config)
 

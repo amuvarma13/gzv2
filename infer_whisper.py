@@ -65,12 +65,6 @@ def download_model(model_id):
     ]
 )
   
-from gzv2.gzf import (
-    GazelleConfig,
-    GazelleForConditionalGeneration,
-    GazelleProcessor,
-)
-
 
 text_model_id= "meta-llama/Llama-3.1-8B-Instruct"
 mm_model_id= "amuvarma/8b-projtrain"

@@ -85,6 +85,8 @@ loaded_model_custom = OrpheusForConditionalGeneration.from_pretrained(mm_model_i
 loaded_model_custom = loaded_model_custom.to("cuda").to(torch.bfloat16)
 
 
+print(loaded_model_custom)
+
 import whisper
 
 whisper_model = whisper.load_model("small")

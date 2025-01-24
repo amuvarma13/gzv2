@@ -27,8 +27,7 @@ class OrpheusCausalLMOutputWithPast(ModelOutput):
     audio_hidden_states: Optional[Tuple[torch.FloatTensor]] = None
 
 class OrpheusPreTrainedModel(PreTrainedModel):
-    config_class = GazelleConfig
-    base_model_prefix = "gazelle"
+    config_class = OrpheusConfig
     supports_gradient_checkpointing = True
     _skip_keys_device_placement = "past_key_values"
     _supports_flash_attn_2 = True

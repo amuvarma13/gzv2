@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Mapping
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -12,7 +12,7 @@ from transformers.cache_utils import Cache
 from transformers.modeling_outputs import ModelOutput
 from vllm.model_executor.models.interfaces import SupportsMultiModal
 
-from vllm.utils import merge_multimodal_embeddings
+from vllm.model_executor.models.utils import merge_multimodal_embeddings
 
 
 from mm_model.components import OrpheusProjector
@@ -119,7 +119,7 @@ class OrpheusForConditionalGeneration(OrpheusPreTrainedModel, SupportsMultiModal
         return self.language_model.tie_weights()
     
     def get_supported_mm_limits(self) -> Mapping[str, Optional[int]]:
-        return {"speech": 10,}
+        return {"speech": 10}
 
     def resize_token_embeddings(
         self, new_num_tokens: Optional[int] = None, pad_to_multiple_of=None

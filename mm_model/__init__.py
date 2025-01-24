@@ -2,7 +2,7 @@
 from .model import (
     GazelleConfig,
     OrpheusForConditionalGeneration,
-    GazellePreTrainedModel,
+    OrpheusPreTrainedModel,
 )
 
 __version__ = "0.1.0"

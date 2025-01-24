@@ -4,9 +4,7 @@ import torch.utils.checkpoint
 from torch import nn
 from torch.nn import functional as F
 from transformers import (
-    CONFIG_MAPPING,
     AutoModel,
-    PretrainedConfig,
     PreTrainedModel,
     AutoModelForCausalLM
 )
@@ -17,7 +15,7 @@ from transformers.modeling_outputs import ModelOutput
 import whisper
 whispermodel = whisper.load_model("small")
 from mm_model.components import OrpheusProjector
-from mm_model.config import GazelleConfig
+from mm_model.config import OrpheusConfig
 
 @dataclass
 class OrpheusCausalLMOutputWithPast(ModelOutput):
@@ -54,7 +52,6 @@ class OrpheusPreTrainedModel(PreTrainedModel):
             if module.padding_idx is not None:
                 module.weight.data[module.padding_idx].zero_()
 
- 
 class OrpheusForConditionalGeneration(OrpheusPreTrainedModel):
     def __init__(self, config: GazelleConfig, new_vocab_size=False):
         super().__init__(config)

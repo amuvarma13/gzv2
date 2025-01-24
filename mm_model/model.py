@@ -10,6 +10,7 @@ from transformers import (
     PreTrainedModel,
     AutoModelForCausalLM
 )
+from dataclasses import dataclass
 from transformers.cache_utils import Cache
 from transformers.modeling_outputs import ModelOutput
 from transformers.utils import (

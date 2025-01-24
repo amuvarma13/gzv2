@@ -52,7 +52,7 @@ class OrpheusPreTrainedModel(PreTrainedModel):
                 module.weight.data[module.padding_idx].zero_()
 
 class OrpheusForConditionalGeneration(OrpheusPreTrainedModel):
-    def __init__(self, config: GazelleConfig, new_vocab_size=False):
+    def __init__(self, config: OrpheusConfig, new_vocab_size=False):
         super().__init__(config)
 
         self.audio_tower = AutoModel.from_config(config.audio_config)

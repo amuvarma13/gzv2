@@ -20,7 +20,7 @@ from mm_model.components import GazelleProjector
 from mm_model.config import GazelleConfig
 
 @dataclass
-class GazelleCausalLMOutputWithPast(ModelOutput):
+class OrpheusCausalLMOutputWithPast(ModelOutput):
     loss: Optional[torch.FloatTensor] = None
     logits: torch.FloatTensor = None
     past_key_values: Optional[List[torch.FloatTensor]] = None
@@ -28,7 +28,7 @@ class GazelleCausalLMOutputWithPast(ModelOutput):
     attentions: Optional[Tuple[torch.FloatTensor]] = None
     audio_hidden_states: Optional[Tuple[torch.FloatTensor]] = None
 
-class GazellePreTrainedModel(PreTrainedModel):
+class OrpheusPreTrainedModel(PreTrainedModel):
     config_class = GazelleConfig
     base_model_prefix = "gazelle"
     supports_gradient_checkpointing = True
@@ -55,7 +55,7 @@ class GazellePreTrainedModel(PreTrainedModel):
                 module.weight.data[module.padding_idx].zero_()
 
  
-class OrpheusForConditionalGeneration(GazellePreTrainedModel):
+class OrpheusForConditionalGeneration(OrpheusPreTrainedModel):
     def __init__(self, config: GazelleConfig, new_vocab_size=False):
         super().__init__(config)
 
@@ -225,7 +225,7 @@ class OrpheusForConditionalGeneration(GazellePreTrainedModel):
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
-    ) -> Union[Tuple, GazelleCausalLMOutputWithPast]:
+    ) -> Union[Tuple, OrpheusCausalLMOutputWithPast]:
         
 
    
@@ -344,7 +344,7 @@ class OrpheusForConditionalGeneration(GazellePreTrainedModel):
             output = (logits,) + outputs[1:]
             return (loss,) + output if loss is not None else output
 
-        return GazelleCausalLMOutputWithPast(
+        return OrpheusCausalLMOutputWithPast(
             loss=loss,
             logits=logits,
             past_key_values=outputs.past_key_values,

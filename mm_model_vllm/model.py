@@ -10,9 +10,9 @@ from transformers import (
 from dataclasses import dataclass
 from transformers.cache_utils import Cache
 from transformers.modeling_outputs import ModelOutput
+from vllm.model_executor.models.interfaces import SupportsMultiModal
 
-
-
+from vllm.utils import merge_multimodal_embeddings
 
 
 from mm_model.components import OrpheusProjector
@@ -52,7 +52,7 @@ class OrpheusPreTrainedModel(PreTrainedModel):
             if module.padding_idx is not None:
                 module.weight.data[module.padding_idx].zero_()
 
-class OrpheusForConditionalGeneration(OrpheusPreTrainedModel):
+class OrpheusForConditionalGeneration(OrpheusPreTrainedModel, SupportsMultiModal):
     def __init__(self, config: OrpheusConfig, new_vocab_size=False):
         super().__init__(config)
 
@@ -79,6 +79,24 @@ class OrpheusForConditionalGeneration(OrpheusPreTrainedModel):
         )
         self.post_init()
 
+    def get_input_embeddings(
+        self,
+        input_ids: torch.Tensor,
+        multimodal_embeddings,
+    ) -> torch.Tensor:
+
+
+        inputs_embeds = self.language_model.get_input_embeddings(input_ids)
+
+        if multimodal_embeddings is not None:
+            inputs_embeds = merge_multimodal_embeddings(
+                input_ids=input_ids, 
+                inputs_embeds=inputs_embeds, 
+                multimodal_embeddings=multimodal_embeddings,
+                placeholder_token_id=self.config.image_token_index)
+
+        return inputs_embeds
+
     def get_input_embeddings(self):
         return self.language_model.get_input_embeddings()
 
@@ -99,6 +117,9 @@ class OrpheusForConditionalGeneration(OrpheusPreTrainedModel):
 
     def tie_weights(self):
         return self.language_model.tie_weights()
+    
+    def get_supported_mm_limits(self) -> Mapping[str, Optional[int]]:
+        return {"speech": 10,}
 
     def resize_token_embeddings(
         self, new_num_tokens: Optional[int] = None, pad_to_multiple_of=None
@@ -205,10 +226,6 @@ class OrpheusForConditionalGeneration(OrpheusPreTrainedModel):
 
         return final_embedding, final_attention_mask, final_labels, position_ids
 
-    def get_multimodal_embeddings(self, audio_values):
-        speech_embeddings = self.multi_modal_projector(audio_values)
-        return speech_embeddings
-    
     def forward(
         self,
         input_ids: torch.LongTensor = None,
@@ -241,8 +258,10 @@ class OrpheusForConditionalGeneration(OrpheusPreTrainedModel):
         )
 
         if inputs_embeds is None:
+            # 1. Extra the input embeddings
             inputs_embeds = self.get_input_embeddings()(input_ids)
 
+            # 2. Merge text and images
             if (
                 audio_values is not None
                 and len(audio_values) > 0

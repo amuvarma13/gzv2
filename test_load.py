@@ -2,6 +2,10 @@ from mm_model import (
     OrpheusConfig,
     OrpheusForConditionalGeneration,
 )
+AutoConfig.register("orpheus", OrpheusConfig)
+AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
+
+
 from transformers import AutoModel, AutoTokenizer
 import soundfile as sf
 

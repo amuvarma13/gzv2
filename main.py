@@ -2,7 +2,7 @@ import time
 from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer
 
-mdn = "meta-llama/Llama-3.2-3B-Instruct"
+mdn = "./orpheus"
 tokenizer = AutoTokenizer.from_pretrained(mdn)
 llm = LLM(mdn)
 from vllm import ModelRegistry

@@ -77,15 +77,15 @@ config = OrpheusConfig(
     audio_token_index=156939,
     vocab_size=156939,
 )
-model = OrpheusForConditionalGeneration(config).to(dtype=torch.bfloat16)
-model.resize_token_embeddings(len(tokenizer))
-special_config =  model.config
+model = OrpheusForConditionalGeneration.from_pretrained(mm_model_id, config=config, new_vocab_size=False).to(dtype=torch.bfloat16)
+# model.resize_token_embeddings(len(tokenizer))
+# special_config =  model.config
 
-loaded_model_custom = OrpheusForConditionalGeneration.from_pretrained(mm_model_id, config=special_config, new_vocab_size=False)
-loaded_model_custom = loaded_model_custom.to("cuda").to(torch.bfloat16)
+# loaded_model_custom = OrpheusForConditionalGeneration.from_pretrained(mm_model_id, config=special_config, new_vocab_size=False)
+# loaded_model_custom = loaded_model_custom.to("cuda").to(torch.bfloat16)
 
 
-print(loaded_model_custom)
+print(model)
 
 # import whisper
 

@@ -47,6 +47,8 @@ new_tokens = [f"<custom_token_{i}>" for i in range(0, number_add_tokens + 1)]  #
 tokenizer.add_tokens(new_tokens)
 tokenizer.add_special_tokens({'additional_special_tokens': ['<|audio|>']})
 
+tokenizer.save_pretrained("./orpheus")
+
 mdn = "./orpheus"
 loaded_model_custom = AutoModel.from_pretrained(mdn)
 print(loaded_model_custom)

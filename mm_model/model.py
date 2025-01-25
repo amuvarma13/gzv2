@@ -56,8 +56,6 @@ class OrpheusForConditionalGeneration(OrpheusPreTrainedModel):
     def __init__(self, config: OrpheusConfig, new_vocab_size=False):
         super().__init__(config)
 
-        self.audio_tower = AutoModel.from_config(config.audio_config)
-
         self.multi_modal_projector = OrpheusProjector(config)
 
         self.vocab_size = config.vocab_size

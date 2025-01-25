@@ -2,6 +2,14 @@ import time
 from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer
 
+from mm_model import (
+    OrpheusConfig,
+    OrpheusForConditionalGeneration,
+)
+from transformers import AutoConfig, AutoModel
+AutoConfig.register("orpheus", OrpheusConfig)
+AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
+
 mdn = "./orpheus"
 tokenizer = AutoTokenizer.from_pretrained(mdn)
 llm = LLM(mdn)
@@ -9,7 +17,7 @@ from vllm import ModelRegistry
 from mm_model_vllm import (OrpheusForConditionalGeneration)
 
 ModelRegistry.register_model("OrpheusForConditionalGeneration", OrpheusForConditionalGeneration)
-model = OrpheusForConditionalGeneration.from_pretrained(mdn)
+model = AutoModel.from_pretrained(mdn)
 
 print(model)
 

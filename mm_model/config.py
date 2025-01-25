@@ -2,6 +2,8 @@ from transformers import PretrainedConfig, CONFIG_MAPPING
 
 class OrpheusConfig(PretrainedConfig):
     
+    model_type = "orpheus"
+
     is_composition = False
     def __init__(
         self,

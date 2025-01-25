@@ -77,13 +77,13 @@ config = OrpheusConfig(
     vocab_size=156939,
 )
 loaded_model_custom = OrpheusForConditionalGeneration.from_pretrained(mm_model_id, config=config, new_vocab_size=False).to(dtype=torch.bfloat16).to("cuda")
+print(loaded_model_custom)
 
 save_directory = "./orpheus"
 loaded_model_custom.save_pretrained(save_directory)
 
 
 
-print(loaded_model_custom)
 
 # import whisper
 

@@ -2,6 +2,7 @@ from mm_model import (
     OrpheusConfig,
     OrpheusForConditionalGeneration,
 )
+from transformers import AutoConfig, AutoModel
 AutoConfig.register("orpheus", OrpheusConfig)
 AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
 

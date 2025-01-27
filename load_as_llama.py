@@ -1,5 +1,6 @@
 mdn = "amuvarma/3b-zuckreg-convo"
 from vllm import ModelRegistry, LLM, SamplingParams
+import inspect
 
 prompts = [
     "Hello, my name is",
@@ -12,6 +13,9 @@ sampling_params = SamplingParams(temperature=0.8, top_p=0.95)
 llm = LLM(model=mdn)
 
 print(llm)
+
+# Inspect the generate function
+print(inspect.getsource(llm.generate))
 
 outputs = llm.generate(prompts, sampling_params)
 

@@ -15,14 +15,14 @@ model = AutoModel.from_pretrained(mdn)
 
 print(model)
 
-def generate_output(prompt, llm, sampling_params):
+def generate_output(prompt, sampling_params):
     start_time = time.time()
     
     # Get input token count
     input_tokens = len(tokenizer.encode(prompt))
     
     # Generate output
-    output = llm.generate([prompt], sampling_params)[0]
+    output = model.generate([prompt], sampling_params)[0]
     generated_text = output.outputs[0].text
     
     # Get output token count and calculate time

@@ -20,10 +20,11 @@ def generate_output(prompt):
     
     # Get input token count
     inputs = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
+    print("inputs", inputs)
     
     # Generate output
     outs = model.generate(
-        **inputs,
+        inputs,
         max_new_tokens=50,
         temperature=0.7,
         repetition_penalty=1.1,

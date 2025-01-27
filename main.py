@@ -6,6 +6,9 @@ from mm_model import (
     OrpheusConfig,
     OrpheusForConditionalGeneration,
 )
+
+from vllm import ModelRegistry
+ModelRegistry.register_model("YourModelForCausalLM", YourModelForCausalLM)
 from transformers import AutoConfig, AutoModel
 AutoConfig.register("orpheus", OrpheusConfig)
 AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)

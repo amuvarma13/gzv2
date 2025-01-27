@@ -8,7 +8,7 @@ from mm_model_vllm import (
 from transformers import AutoConfig, AutoModel
 AutoConfig.register("orpheus", OrpheusConfig)
 AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
-mdn = "amuvarma/3b-zuckreg-convo-projsnactune"
+mdn = "./orpheus"
 
 tokenizer = AutoTokenizer.from_pretrained(mdn)
 model = AutoModel.from_pretrained(mdn)

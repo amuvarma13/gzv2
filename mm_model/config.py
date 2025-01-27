@@ -9,7 +9,7 @@ class OrpheusConfig(PretrainedConfig):
         self,
         audio_config=None,
         text_config=None,
-        text_model_id=None,
+        # text_model_id=None,
         ignore_index=-100,
         audio_token_index=32000,
         vocab_size=32000,
@@ -22,7 +22,7 @@ class OrpheusConfig(PretrainedConfig):
         self.audio_token_index = audio_token_index
         self.vocab_size = vocab_size
 
-        self.text_model_id = text_model_id
+        # self.text_model_id = text_model_id
 
         self.audio_config = audio_config
         self.text_config = text_config

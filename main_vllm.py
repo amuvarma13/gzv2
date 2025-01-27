@@ -5,10 +5,6 @@ from mm_model_vllm import (
     OrpheusForConditionalGeneration,
 )
 
-from transformers import AutoConfig, AutoModel
-AutoConfig.register("orpheus", OrpheusConfig)
-AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
-
 from vllm import ModelRegistry, LLM, SamplingParams
 ModelRegistry.register_model("OrpheusForConditionalGeneration", OrpheusForConditionalGeneration)
 

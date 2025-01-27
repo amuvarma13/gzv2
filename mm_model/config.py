@@ -28,7 +28,6 @@ class OrpheusConfig(PretrainedConfig):
         self.text_config = text_config
 
         self.hidden_size = hidden_size
-        print("self.hidden_size", self.hidden_size)
         self.stack_factor = stack_factor
         self.projector_type = projector_type
 

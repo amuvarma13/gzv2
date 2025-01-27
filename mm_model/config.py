@@ -24,6 +24,8 @@ class OrpheusConfig(PretrainedConfig):
         self.audio_hidden_size = audio_hidden_size
         self.text_config = text_config
 
+        self.text_model_id = None
+
         self.hidden_size = hidden_size
         self.stack_factor = stack_factor
         self.projector_type = projector_type

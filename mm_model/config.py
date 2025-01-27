@@ -7,7 +7,7 @@ class OrpheusConfig(PretrainedConfig):
     is_composition = False
     def __init__(
         self,
-        # audio_config=None,
+        audio_config=None,
         text_config=None,
         # text_model_id=None,
         ignore_index=-100,
@@ -24,7 +24,7 @@ class OrpheusConfig(PretrainedConfig):
 
         # self.text_model_id = text_model_id
 
-        # self.audio_config = audio_config
+        self.audio_config = audio_config
         self.text_config = text_config
 
         self.hidden_size = hidden_size

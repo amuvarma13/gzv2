@@ -15,31 +15,35 @@ model = AutoModel.from_pretrained(mdn)
 
 print(model)
 
-def generate_output(prompt, sampling_params):
+def generate_output(prompt):
     start_time = time.time()
     
     # Get input token count
-    input_tokens = len(tokenizer.encode(prompt))
+    input_tokens = tokenizer.encode(prompt)
     
     # Generate output
-    output = model.generate([prompt], sampling_params)[0]
-    generated_text = output.outputs[0].text
+    outs = model.generate(
+        input_ids = input_tokens,
+        max_new_tokens=50,
+        temperature=0.7,
+        repetition_penalty=1.1,
+        top_p=0.9,
+        eos_token_id=128258,
+    )
     
-    # Get output token count and calculate time
-    output_tokens = len(tokenizer.encode(generated_text))
-    total_tokens = input_tokens + output_tokens
+    total_tokens = outs
     elapsed_time = time.time() - start_time
     tokens_per_second = total_tokens / elapsed_time
     
     print(f"Prompt: {prompt!r}")
-    print(f"Generated text: {generated_text!r}")
     print(f"Tokens per second: {tokens_per_second:.2f}")
     print(f"Total tokens: {total_tokens}")
     print(f"Time elapsed: {elapsed_time:.2f}s")
     
-    return generated_text
+    # return generated_text
 
-# prompt = "Here is a short story about a dragon:"
+prompt = "Here is a short story about a dragon:"
+generate_output(prompt)
 # sampling_params = SamplingParams(max_tokens=500)
 # generate_output(prompt, llm, sampling_params)
 

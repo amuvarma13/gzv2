@@ -205,6 +205,7 @@ def get_all_embeds(existing_embeds, audio_features):
     all_embeds = torch.cat([start_embeds, audio_embeds, end_embeds], dim=1)
   print("all_embeds.shape", all_embeds.shape)
   inputs = {"inputs_embeds": all_embeds.to(loaded_model_custom.device).to(torch.float8)}
+  loaded_model_custom = loaded_model_custom.to("cuda").to(torch.float8)
   outs = loaded_model_custom.generate(
         **inputs,
         max_new_tokens=50,

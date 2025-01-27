@@ -2,8 +2,8 @@ from huggingface_hub import HfApi
 import os
 
 
-base_repo_id = "modelssnac/checkpoint-1229"
-upload_name = "amuvarma/zuck-post-final-tune-att2"
+base_repo_id = "./orpheus"
+upload_name = "amuvarma/zuck-3bregconvo-automodelcompat"
 
 
 def push_folder_to_hub(local_folder, repo_id, commit_message="Update model"):

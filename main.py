@@ -1,25 +1,16 @@
 import time
-from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer
-
-from mm_model import (
+from mm_model_vllm import (
     OrpheusConfig,
     OrpheusForConditionalGeneration,
 )
 
-from vllm import ModelRegistry
-ModelRegistry.register_model("YourModelForCausalLM", YourModelForCausalLM)
 from transformers import AutoConfig, AutoModel
 AutoConfig.register("orpheus", OrpheusConfig)
 AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
+mdn = "amuvarma/3b-zuckreg-convo-projsnactune"
 
-mdn = "./orpheus"
 tokenizer = AutoTokenizer.from_pretrained(mdn)
-llm = LLM(mdn)
-from vllm import ModelRegistry
-from mm_model_vllm import (OrpheusForConditionalGeneration)
-
-ModelRegistry.register_model("OrpheusForConditionalGeneration", OrpheusForConditionalGeneration)
 model = AutoModel.from_pretrained(mdn)
 
 print(model)

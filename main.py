@@ -31,7 +31,7 @@ def generate_output(prompt):
         eos_token_id=128258,
     )
     
-    total_tokens = outs
+    total_tokens = outs.shape[1].item()
     elapsed_time = time.time() - start_time
     tokens_per_second = total_tokens / elapsed_time
     print("outs", outs)

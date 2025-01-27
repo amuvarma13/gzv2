@@ -12,7 +12,7 @@ AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
 mdn = "./orpheus"
 
 tokenizer = AutoTokenizer.from_pretrained(mdn)
-model = AutoModel.from_pretrained(mdn, load_in_8bit=True)
+# model = AutoModel.from_pretrained(mdn, load_in_8bit=True)
 model = model.to("cuda")
 
 

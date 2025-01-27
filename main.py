@@ -12,9 +12,9 @@ AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
 mdn = "./orpheus"
 
 tokenizer = AutoTokenizer.from_pretrained(mdn)
-model = AutoModel.from_pretrained(mdn)
+model = AutoModel.from_pretrained(mdn, load_in_8bit=True)
 model = model.to("cuda")
-model = model.to(torch.float8)
+
 
 
 def generate_output(prompt):

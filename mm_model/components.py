@@ -40,9 +40,9 @@ class ProjectionLayer(nn.Module):
 
 class OrpheusProjector(ProjectionLayer):
     def __init__(self, config: OrpheusConfig):
-        self.hidden_dim = config.audio_hidden_size
+        self.hidden_dim = config.hidden_size
         super().__init__(config.stack_factor)
-        self.ln_pre = RMSNorm(config.hidden_size * self.stack_factor)
+        self.ln_pre = RMSNorm(config.audio_hidden_size * self.stack_factor)
         self.linear_1 = nn.Linear(
             config.audio_hidden_size * self.stack_factor,
             self.hidden_dim,

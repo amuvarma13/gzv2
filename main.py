@@ -19,11 +19,11 @@ def generate_output(prompt):
     start_time = time.time()
     
     # Get input token count
-    input_tokens = tokenizer.encode(prompt)
+    inputs = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
     
     # Generate output
     outs = model.generate(
-        input_ids = input_tokens,
+        **inputs,
         max_new_tokens=50,
         temperature=0.7,
         repetition_penalty=1.1,

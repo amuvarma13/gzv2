@@ -5,9 +5,12 @@ from mm_model_vllm import (
     OrpheusForConditionalGeneration,
 )
 
-from vllm import ModelRegistry
+from transformers import AutoConfig, AutoModel
+AutoConfig.register("gazelle", OrpheusConfig)
+AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
+
+from vllm import ModelRegistry, LLM, SamplingParams
 ModelRegistry.register_model("OrpheusForConditionalGeneration", OrpheusForConditionalGeneration)
-from vllm import LLM, SamplingParams
 
 prompts = [
     "Hello, my name is",

@@ -13,7 +13,6 @@ mdn = "./orpheus"
 tokenizer = AutoTokenizer.from_pretrained(mdn)
 model = AutoModel.from_pretrained(mdn)
 
-print(model)
 
 def generate_output(prompt):
     start_time = time.time()
@@ -35,7 +34,7 @@ def generate_output(prompt):
     total_tokens = outs
     elapsed_time = time.time() - start_time
     tokens_per_second = total_tokens / elapsed_time
-    
+    print("outs", outs)
     print(f"Prompt: {prompt!r}")
     print(f"Tokens per second: {tokens_per_second:.2f}")
     print(f"Total tokens: {total_tokens}")

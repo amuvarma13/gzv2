@@ -6,7 +6,7 @@ from mm_model_vllm import (
 )
 
 from transformers import AutoConfig, AutoModel
-AutoConfig.register("gazelle", OrpheusConfig)
+AutoConfig.register("orpheus", OrpheusConfig)
 AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
 
 from vllm import ModelRegistry, LLM, SamplingParams

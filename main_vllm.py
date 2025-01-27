@@ -6,7 +6,7 @@ from mm_model_vllm import (
 )
 
 from vllm import ModelRegistry, LLM, SamplingParams
-ModelRegistry.register_model("OrpheusForConditionalGeneration", OrpheusForConditionalGeneration)
+ModelRegistry.register_model("orpheus", OrpheusForConditionalGeneration)
 
 prompts = [
     "Hello, my name is",

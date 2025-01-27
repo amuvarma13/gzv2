@@ -1,6 +1,6 @@
 from huggingface_hub import snapshot_download
 
-mdn = "amuvarma/3b-zuckreg-convo-projsnactune"
+mdn = "amuvarma/3b-zuckreg-convo"
 
 
 model_path = snapshot_download(

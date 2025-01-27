@@ -12,6 +12,7 @@ mdn = "./orpheus"
 
 tokenizer = AutoTokenizer.from_pretrained(mdn)
 model = AutoModel.from_pretrained(mdn)
+model = model.to("cuda")
 
 
 def generate_output(prompt):

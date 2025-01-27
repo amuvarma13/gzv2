@@ -2,33 +2,32 @@ from transformers import PretrainedConfig, CONFIG_MAPPING
 
 class OrpheusConfig(PretrainedConfig):
     
+    model_type = "orpheus"
+
     is_composition = False
     def __init__(
         self,
-        audio_config=None,
         text_config=None,
-        audio_model_id=None,
-        text_model_id=None,
+        audio_hidden_size = 768,
         ignore_index=-100,
         audio_token_index=32000,
         vocab_size=32000,
         hidden_size=3072,
         stack_factor=8,
         projector_type="mlp",
+        
+        
         **kwargs,
     ):
         self.ignore_index = ignore_index
         self.audio_token_index = audio_token_index
         self.vocab_size = vocab_size
-
-        self.audio_model_id = audio_model_id
-        self.text_model_id = text_model_id
-
-        self.audio_config = audio_config
+        self.audio_hidden_size = audio_hidden_size
         self.text_config = text_config
 
+        self.text_model_id = None
+
         self.hidden_size = hidden_size
-        print("self.hidden_size", self.hidden_size)
         self.stack_factor = stack_factor
         self.projector_type = projector_type
 
@@ -41,13 +40,4 @@ class OrpheusConfig(PretrainedConfig):
         elif text_config is None:
             self.text_config = CONFIG_MAPPING["llama"]()
         
-        if isinstance(self.audio_config, dict):
-            audio_config["model_type"] = (
-                audio_config["model_type"] if "model_type" in audio_config else "wav2vec2"
-            )
-            self.audio_config = CONFIG_MAPPING[audio_config["model_type"]](**audio_config)
-            self.vocab_size = self.audio_config.vocab_size
-        elif audio_config is None:
-            self.audio_config = CONFIG_MAPPING["wav2vec2"]()
-
         super().__init__(**kwargs)

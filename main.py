@@ -6,7 +6,7 @@ from mm_model_vllm import (
 )
 
 from transformers import AutoConfig, AutoModel
-AutoConfig.register("orpheus", OrpheusConfig)
+AutoConfig.register("gazelle", OrpheusConfig)
 AutoModel.register(OrpheusConfig, OrpheusForConditionalGeneration)
 mdn = "amuvarma/3b-zuckreg-convo-projsnactune"
 
